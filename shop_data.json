@@ -1,0 +1,212 @@
+{
+  "Audio": [
+    {
+      "name": "QSC-KW122",
+      "price_from": 100
+    },
+    {
+      "name": "QSC K12",
+      "price_from": 70
+    },
+    {
+      "name": "QSC KW181",
+      "price_from": 100
+    },
+    {
+      "name": "QSC HPR122",
+      "price_from": 75
+    },
+    {
+      "name": "Mackie 1801",
+      "price_from": 90
+    },
+    {
+      "name": "QSC K10",
+      "price_from": 70
+    },
+    {
+      "name": "QSC KW152",
+      "price_from": 100
+    },
+    {
+      "name": "Alto Busker - Battery Powered PA",
+      "price_from": 50
+    }
+  ],
+  "Lighting": [
+    {
+      "name": "Chauvet SlimPAR HEX 3 IRC",
+      "price_from": 25
+    },
+    {
+      "name": "Chauvet SlimPAR QUAD 3 IRC",
+      "price_from": 25
+    },
+    {
+      "name": "Chauvet SlimPAR H6 USB",
+      "price_from": 25
+    },
+    {
+      "name": "COLORrail IRC",
+      "price_from": 25
+    },
+    {
+      "name": "Chauvet LFS-75",
+      "price_from": 30
+    },
+    {
+      "name": "Chauvet GigBAR Move",
+      "price_from": 50
+    },
+    {
+      "name": "Rockville RF Wedge Uplights x6",
+      "price_from": 80
+    },
+    {
+      "name": "Chauvet Intimidator Spot 350",
+      "price_from": 75
+    },
+    {
+      "name": "Chauvet Intimidator Hybrid 140SR",
+      "price_from": 150
+    }
+  ],
+  "DJ Gear": [
+    {
+      "name": "Pioneer CDJ-2000NXS2",
+      "price_from": 150
+    },
+    {
+      "name": "Technics 1200 M3D",
+      "price_from": 85
+    },
+    {
+      "name": "Pioneer DJM-900NXS2",
+      "price_from": 175
+    },
+    {
+      "name": "Pioneer DDJ-SZ",
+      "price_from": 150
+    },
+    {
+      "name": "Pioneer DJM-S9",
+      "price_from": 120
+    },
+    {
+      "name": "Technics SL-1200MK2",
+      "price_from": 85
+    }
+  ],
+  "Accessories, Cables, Misc": [
+    {
+      "name": "Speaker Stands",
+      "price_from": 10
+    },
+    {
+      "name": "Boom Mic Stand",
+      "price_from": 10
+    },
+    {
+      "name": "Mic Stand",
+      "price_from": 10
+    },
+    {
+      "name": "Stanchion Barrier 78\"",
+      "price_from": 10
+    },
+    {
+      "name": "Alto Stealth Pro Wireless",
+      "price_from": 15
+    }
+  ],
+  "Visuals": [
+    {
+      "name": "32\" TV Screen",
+      "price_from": 50
+    },
+    {
+      "name": "55\" TV Screen",
+      "price_from": 100
+    },
+    {
+      "name": "120” Projector Screen",
+      "price_from": 130
+    },
+    {
+      "name": "Epson EX5250",
+      "price_from": 20
+    }
+  ],
+  "Soundboards": [
+    {
+      "name": "Yamaha MGP24X",
+      "price_from": 150
+    },
+    {
+      "name": "Allen & Heath Zed-10FX",
+      "price_from": 30
+    },
+    {
+      "name": "Behringer Xenyx X1222USB",
+      "price_from": 50
+    },
+    {
+      "name": "Allen & Heath Zed-6FX",
+      "price_from": 15
+    }
+  ],
+  "Add-Ons": [
+    {
+      "name": "Photo Booth",
+      "price_from": 700
+    },
+    {
+      "name": "3x3' Intelistage x6 with Steps and Skirt",
+      "price_from": 225
+    },
+    {
+      "name": "Marq 700 Haze Machine",
+      "price_from": 15
+    }
+  ],
+  "Microphones": [
+    {
+      "name": "Sennheiser XSW 1-835 Dual",
+      "price_from": 40
+    },
+    {
+      "name": "Shure SM58",
+      "price_from": 10
+    },
+    {
+      "name": "Sennheiser EW 100 835 Wireless Microphone",
+      "price_from": 50
+    },
+    {
+      "name": "Sennheiser XSW 1-ME3-A",
+      "price_from": 40
+    },
+    {
+      "name": "Sennheiser XSW 1-825 Wireless Microphone",
+      "price_from": 25
+    },
+    {
+      "name": "Shure SLXD24D/SM58 Dual",
+      "price_from": 80
+    }
+  ],
+  "Truss": [
+    {
+      "name": "Global Truss 6.5’",
+      "price_from": 40
+    },
+    {
+      "name": "Global Truss 5’",
+      "price_from": 30
+    },
+    {
+      "name": "Global Truss 8’",
+      "price_from": 40
+    }
+  ]
+}
