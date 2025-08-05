@@ -38,20 +38,23 @@ async def chat(req: ChatRequest):
     # Similarity search
     raw_docs = db.similarity_search(question, k=15)
 
-    # Deduplicate by metadata['title'] + optionally URL or price
-    seen_titles = set()
+    # Deduplicate by (title + url) to ensure unique products
+    seen_keys = set()
     deduped_docs = []
     for doc in raw_docs:
         title = doc.metadata.get("title", "").strip().lower()
-        if title and title not in seen_titles:
-            seen_titles.add(title)
+        url = doc.metadata.get("url", "").strip().lower()
+        key = f"{title}-{url}"
+        if key not in seen_keys:
+            seen_keys.add(key)
             deduped_docs.append(doc)
+
             
     max_context_length = 3000  # 
     context = ""
-    for doc in deduped_docs:
-        next_entry = f"\n---\n{doc.page_content}"
-        if len(context) + len(next_entry) > max_context_length:
+    for doc in deduped_docs: # 
+        next_entry = f"\n---\n{doc.page_content}" 
+        if len(context) + len(next_entry) > max_context_length: 
             break
         context += next_entry
 
