@@ -1,5 +1,6 @@
 # parse_shop.py
-# This script parses the cleaned shop text file and converts it into a structured JSON format.
+# This script parses the cleaned shop text file (shop_clean.txt) and converts it into a 
+# structured JSON format for the LLM
 
 import json
 

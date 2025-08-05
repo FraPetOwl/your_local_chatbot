@@ -1,212 +1,290 @@
-{
-  "Audio": [
-    {
-      "name": "QSC-KW122",
-      "price_from": 100
-    },
-    {
-      "name": "QSC K12",
-      "price_from": 70
-    },
-    {
-      "name": "QSC KW181",
-      "price_from": 100
-    },
-    {
-      "name": "QSC HPR122",
-      "price_from": 75
-    },
-    {
-      "name": "Mackie 1801",
-      "price_from": 90
-    },
-    {
-      "name": "QSC K10",
-      "price_from": 70
-    },
-    {
-      "name": "QSC KW152",
-      "price_from": 100
-    },
-    {
-      "name": "Alto Busker - Battery Powered PA",
-      "price_from": 50
-    }
-  ],
-  "Lighting": [
-    {
-      "name": "Chauvet SlimPAR HEX 3 IRC",
-      "price_from": 25
-    },
-    {
-      "name": "Chauvet SlimPAR QUAD 3 IRC",
-      "price_from": 25
-    },
-    {
-      "name": "Chauvet SlimPAR H6 USB",
-      "price_from": 25
-    },
-    {
-      "name": "COLORrail IRC",
-      "price_from": 25
-    },
-    {
-      "name": "Chauvet LFS-75",
-      "price_from": 30
-    },
-    {
-      "name": "Chauvet GigBAR Move",
-      "price_from": 50
-    },
-    {
-      "name": "Rockville RF Wedge Uplights x6",
-      "price_from": 80
-    },
-    {
-      "name": "Chauvet Intimidator Spot 350",
-      "price_from": 75
-    },
-    {
-      "name": "Chauvet Intimidator Hybrid 140SR",
-      "price_from": 150
-    }
-  ],
-  "DJ Gear": [
-    {
-      "name": "Pioneer CDJ-2000NXS2",
-      "price_from": 150
-    },
-    {
-      "name": "Technics 1200 M3D",
-      "price_from": 85
-    },
-    {
-      "name": "Pioneer DJM-900NXS2",
-      "price_from": 175
-    },
-    {
-      "name": "Pioneer DDJ-SZ",
-      "price_from": 150
-    },
-    {
-      "name": "Pioneer DJM-S9",
-      "price_from": 120
-    },
-    {
-      "name": "Technics SL-1200MK2",
-      "price_from": 85
-    }
-  ],
-  "Accessories, Cables, Misc": [
-    {
-      "name": "Speaker Stands",
-      "price_from": 10
-    },
-    {
-      "name": "Boom Mic Stand",
-      "price_from": 10
-    },
-    {
-      "name": "Mic Stand",
-      "price_from": 10
-    },
-    {
-      "name": "Stanchion Barrier 78\"",
-      "price_from": 10
-    },
-    {
-      "name": "Alto Stealth Pro Wireless",
-      "price_from": 15
-    }
-  ],
-  "Visuals": [
-    {
-      "name": "32\" TV Screen",
-      "price_from": 50
-    },
-    {
-      "name": "55\" TV Screen",
-      "price_from": 100
-    },
-    {
-      "name": "120” Projector Screen",
-      "price_from": 130
-    },
-    {
-      "name": "Epson EX5250",
-      "price_from": 20
-    }
-  ],
-  "Soundboards": [
-    {
-      "name": "Yamaha MGP24X",
-      "price_from": 150
-    },
-    {
-      "name": "Allen & Heath Zed-10FX",
-      "price_from": 30
-    },
-    {
-      "name": "Behringer Xenyx X1222USB",
-      "price_from": 50
-    },
-    {
-      "name": "Allen & Heath Zed-6FX",
-      "price_from": 15
-    }
-  ],
-  "Add-Ons": [
-    {
-      "name": "Photo Booth",
-      "price_from": 700
-    },
-    {
-      "name": "3x3' Intelistage x6 with Steps and Skirt",
-      "price_from": 225
-    },
-    {
-      "name": "Marq 700 Haze Machine",
-      "price_from": 15
-    }
-  ],
-  "Microphones": [
-    {
-      "name": "Sennheiser XSW 1-835 Dual",
-      "price_from": 40
-    },
-    {
-      "name": "Shure SM58",
-      "price_from": 10
-    },
-    {
-      "name": "Sennheiser EW 100 835 Wireless Microphone",
-      "price_from": 50
-    },
-    {
-      "name": "Sennheiser XSW 1-ME3-A",
-      "price_from": 40
-    },
-    {
-      "name": "Sennheiser XSW 1-825 Wireless Microphone",
-      "price_from": 25
-    },
-    {
-      "name": "Shure SLXD24D/SM58 Dual",
-      "price_from": 80
-    }
-  ],
-  "Truss": [
-    {
-      "name": "Global Truss 6.5’",
-      "price_from": 40
-    },
-    {
-      "name": "Global Truss 5’",
-      "price_from": 30
-    },
-    {
-      "name": "Global Truss 8’",
-      "price_from": 40
-    }
-  ]
-}
+[
+  {
+    "url": "https://twice.shop/superiorsounds1/product/CDumLv9ieGhM0Pp5PCTA",
+    "title": "Sennheiser XSW 1-ME3-A",
+    "price": "40",
+    "description": "Sennheiser XSW 1-ME3-A Wireless Headmic Set, A Range 548-572 MHz"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/NlbKbXXrzR4b8IG3BjSQ",
+    "title": "Allen & Heath Zed-6FX",
+    "price": "15",
+    "description": "6-Channel mixer 2 Mic / Line inputs\n2 Dual stereo inputs\nHi-Pass filter\n2-Band EQ\nXLR main output\nFX output\nBuilt-in effects device\n1x AUX / FX sends (post)\n8 LED signal display\n48 V Phantom power\nHeadphone jack"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/ocmSXqPlsC0ULqSH2psR",
+    "title": "QSC-KW122",
+    "price": "100",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/FZsohSNUGqafj7seeAln",
+    "title": "Speaker Stands",
+    "price": "10",
+    "description": "Pair"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/7EbHQQORmMbrpqzFhjat",
+    "title": "Marq 700 Haze Machine",
+    "price": "15",
+    "description": "The Marq Lighting Haze 700 is a compact hazer with 700 watts of power. With the large 1.2 liter tank with level indicator, the Haze 700 delivers up to 4 hours of haze. The Quick-Ready™ system ensures a particularly fast heat-up time of just 2 minutes. The Haze 700 is controlled via an integrated cable remote control with adjustable intensity. If needed for more than 4 Hours, book additional Fluid."
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/192uEuwl5kAS3tz9AMYH",
+    "title": "Sennheiser XSW 1-825 Wireless Microphone",
+    "price": "25",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/2sORr2KimGb2sTZ0i24B",
+    "title": "Allen & Heath Zed-10FX",
+    "price": "30",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/lok90Go4wqgZ1HTZBgQK",
+    "title": "QSC KW152",
+    "price": "100",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/SZZvpIwmEQOI05oTspaM",
+    "title": "QSC K10",
+    "price": "70",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/R8BOykVcREhozTzDA2ib",
+    "title": "Chauvet LFS-75",
+    "price": "30",
+    "description": "LFS-75DMX is a powerful framing spot fitted with a 75-watt LED to project crisp patterns and messages onto any surface. Built-in DMX control and dimming capabilities allow the light to be used exactly when your show dictates, while an integrated color wheel adds an additional dimension to your projections. Framing shutters block light out of unwanted areas and a unique gobo slot accepts standard, or your customized, round or square-shaped gobos."
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/bdggEF9ae0MDOF76go0H",
+    "title": "Shure SLXD24D/SM58 Dual",
+    "price": "80",
+    "description": "Shure SLXD24D/SM58 Digital Wireless Dual Handheld Microphone System"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/S1BLjFEL9pqB6IWOxrW1",
+    "title": "Rockville RF Wedge Uplights x6",
+    "price": "80",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/q8rPQt7KzqI5Alvhijfi",
+    "title": "QSC K12",
+    "price": "70",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/xxGBjPqCna9OZUI8PcSh",
+    "title": "Technics 1200 M3D",
+    "price": "85",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/KZyrgZ1R9eGPIk019aK7",
+    "title": "Chauvet SlimPAR HEX 3 IRC",
+    "price": "25",
+    "description": "SlimPAR HEX 3 IRC is a low-profile LED PAR with 6-in-1 LED technology (RGBAW+UV) and built-in infrared remote control capability. A new, sit-flat housing design hugs the floor and features power and DMX outlets on the side of the unit, while 6-in-1 LED technology allows you to generate a broad spectrum of colors and achieve natural-looking color temperatures. For wireless operation and control, use the optional IRC-6 remote for point-and-shoot operation of static colors and automated programs. Its sleek and lightweight design easily fits inside sticks of TRUSST®, while DMX, Master/Slave and Sound-Active modes simplify control options. Create customized colors using the built-in LED display and achieve smooth LED fading with built-in dimming curves."
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/WwLNv0P3hkWzhdT42ZWy",
+    "title": "Mackie 1801",
+    "price": "90",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/BzPtPwBTrW4qkPXaf6nm",
+    "title": "Boom Mic Stand",
+    "price": "10",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/4Tc51wqonMlaj6dEvmus",
+    "title": "Sennheiser XSW 1-835 Dual",
+    "price": "40",
+    "description": "Sennheiser XSW 1-835 Dual-Vocal Set with 2 835 Handheld Mics (A: 548 to 572 MHz)"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/Th3Kgu68TtZaGIenGY7w",
+    "title": "32\" TV Screen",
+    "price": "50",
+    "description": "32 inch LED TV Screen"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/eT4XUnllAkxeTsqyXxk7",
+    "title": "Global Truss 5’",
+    "price": "30",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/RQ8WgCus5jdOcABDJFmH",
+    "title": "Pioneer DDJ-SZ",
+    "price": "150",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/ZFwFAsvcRWS0MAt0KNr4",
+    "title": "Shure SM58",
+    "price": "10",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/8EC3OdiU8qzHfYwHTlDc",
+    "title": "Chauvet Intimidator Spot 350",
+    "price": "75",
+    "description": "Intimidator Spot LED 350 is one of the most powerful fixtures in the acclaimed Intimidator line. A 75-watt LED and superior optics make this fixture considerably brighter than most higher watt LED fixtures currently on the market. This feature-packed moving head includes a motorized focus for projecting crisp, rotating gobos from most distances. A rotating 3-facet prism splits the beam for maximum effects and coverage, while interchangeable gobos let you vary and customize the show."
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/rFGsYvE0iAh90aSfDV0T",
+    "title": "Sennheiser EW 100 835 Wireless Microphone",
+    "price": "50",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/pGykyDwL6BcSSoeQpDj5",
+    "title": "120” Projector Screen",
+    "price": "130",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/2iFFgDQ91JlefKYPGKsw",
+    "title": "Global Truss 6.5’",
+    "price": "40",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/saKAGPiZKXNMDKBxTMAM",
+    "title": "Global Truss 8’",
+    "price": "40",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/hnibtGLjtzBHs9DWcW95",
+    "title": "QSC KW181",
+    "price": "100",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/uPZzn0Gs0pPlmS0kL6cD",
+    "title": "Chauvet Intimidator Hybrid 140SR",
+    "price": "150",
+    "description": "Moving-head Beam/Spot/Wash Light"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/s6h6qx1VRAkdfR5auwse",
+    "title": "Stanchion Barrier 78\"",
+    "price": "10",
+    "description": "Crowd Control Stanchion / Queue Barrier, RED Strap, 78\""
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/nXFw3efAwu8VFuuXQfKI",
+    "title": "QSC HPR122",
+    "price": "75",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/iNWpQukbjJHWqPw8cBJe",
+    "title": "Pioneer CDJ-2000NXS2",
+    "price": "150",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/cZG2ljjFVE7sOaUgXSAT",
+    "title": "Chauvet SlimPAR H6 USB",
+    "price": "25",
+    "description": "SlimPAR H6 USB is a low-profile RGBAW+UV LED washlight with D-Fi USB compatibility for wireless master/slave or DMX control. It also works in sound-active mode. Built-in dimming curves provide smooth LED fading, and the 6-in-1 LED technology generates a broad spectrum of natural looking colors. Precise colors can also be created with the built-in LED display. Point-and-shoot operation of static colors and automated programs is possible with the optional IRC-6 remote."
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/BY2mp93UzjePNhzrZwg9",
+    "title": "Chauvet GigBAR Move",
+    "price": "50",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/kipMulLFKvbZ5D2E7RLw",
+    "title": "3x3' Intelistage x6 with Steps and Skirt",
+    "price": "225",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/7hHjNsIYspISSM87Z6jy",
+    "title": "Epson EX5250",
+    "price": "20",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/t5ZkaLRMn2i6z9dToCFa",
+    "title": "Mic Stand",
+    "price": "10",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/PFazmJhvbm90SLsJwTfo",
+    "title": "Pioneer DJM-S9",
+    "price": "120",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/R2N82ZaZoEV8LNW2IcOy",
+    "title": "Behringer Xenyx X1222USB",
+    "price": "50",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/cptLOBuae4ezoychHz8D",
+    "title": "Chauvet SlimPAR QUAD 3 IRC",
+    "price": "25",
+    "description": "SlimPAR QUAD 3 IRC is a low-profile, quad-color (RGBA) LED PAR with built-in infrared remote control capability. Punchy amber LEDs allow you to generate a broad spectrum of colors and achieve natural looking color temperatures, while the optional IRC-6 remote control provides an easy point-and-shoot operation of static colors and automated programs. The SlimPAR QUAD 3 IRC is perfect for quiet applications and allows you to create any color without DMX by using the built-in digital display. Save time running cables and extension cords by power linking multiple units or create coordinated light shows by linking other quad-color LED SlimPAR fixtures in Master/Slave mode."
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/WkVb7Xj0XrIfC5vbQDqe",
+    "title": "COLORrail IRC",
+    "price": "25",
+    "description": "COLORrail IRC is a linear wash and effect light fitted with 320 LEDs (128 red, 96 green, 96 blue) and featuring built-in, infrared technology. Create your own looks with eight sections of DMX control, or generate eye-catching chase and runway effects with built-in, automated and sound-activated programs. Thanks to tightly packed and evenly distributed LEDs, color mixing and wall washing occur almost immediately."
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/8UzryhXugZfiKCFz61s7",
+    "title": "Alto Stealth Pro Wireless",
+    "price": "15",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/sZCPHvP1xK7orkYIMVzz",
+    "title": "Yamaha MGP24X",
+    "price": "150",
+    "description": "The Yamaha MGP24x 24-Channel Analog Mixing Console with DSP Effects is a 24-track analog mixer with digital control and features 16 D-Pre microphone preamps, 24 line inputs, 6 auxiliary inputs and 2 effects sends. It is designed for use in live sound environments, including clubs and houses of worship. Each channel has Yamaha's x-pressive 3-band equalizer and 1-Knob compressor, allowing channel-independent frequency and dynamic control. The MGP24x has an integrated DSP Hybrid Channel section that includes 3 types of reverb and 16 effects, as well as auto-ducker and auto-leveler functions that allow for hands-off monitoring of sources. The digital portion of the MGP24x also allows for iPhone and iPod touch control of a variety of parameters via the free MGP Editor app. You can also playback music from your iTunes catalog via the iOS input USB port, freeing up an analog input on the console. A second USB port allows you to record your live performance directly to external USB media, as either a stereo WAV or MP3 file."
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/jHVbhJkFuAaShf4PJfT8",
+    "title": "Technics SL-1200MK2",
+    "price": "85",
+    "description": "N/A"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/1LE7WqQ0taRcH5uejNm6",
+    "title": "55\" TV Screen",
+    "price": "100",
+    "description": "55 inch RCS LCD Screen"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/nl2Kk6QjmBXBW6c8Sy1o",
+    "title": "Alto Busker - Battery Powered PA",
+    "price": "50",
+    "description": "Features: 200W of powerful, portable sound with 6.5\" (165mm) woofer and 1\" (25mm) tweeter Battery Eco Mode for increased performance up to 24 hours Compact, lightweight design that's easy to transport Free Alto App (iOS/Android) for remote configuration and control Bluetooth music streaming direct from your device Integrated 3-channel mixer with built-in Alesis FX 2 XLR/TRS \"Combo\" inputs (for mics, instruments, & line level sources) Aux input for non-Bluetooth devices Versatile tilt or stand design for any setting Use standalone or on a pole with DSP Speaker Use modes for tuned sound. Link two Buskers wirelessly via Bluetooth for stereo playback Flexible horizontal and vertical monitor positions"
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/1Xn1tEqywbixtb1wpixm",
+    "title": "Photo Booth",
+    "price": "700",
+    "description": "Photo Booth includes ability for your guests to text or airdrop right after photos are taken. We will send you a google drive with all copies after your event. Attendant not included."
+  },
+  {
+    "url": "https://twice.shop/superiorsounds1/product/ghRmWFgK47tExSJNSh1G",
+    "title": "Pioneer DJM-900NXS2",
+    "price": "175",
+    "description": "N/A"
+  }
+]
