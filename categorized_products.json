@@ -4,13 +4,13 @@
         "title": "Sennheiser XSW 1-ME3-A",
         "price": "40",
         "description": "Sennheiser XSW 1-ME3-A Wireless Headmic Set, A Range 548-572 MHz",
-        "category": "other"
-    },
+        "category": "audio_equipment"
+    }, 
     {
         "url": "https://twice.shop/superiorsounds1/product/NlbKbXXrzR4b8IG3BjSQ",
         "title": "Allen & Heath Zed-6FX",
         "price": "15",
-        "description": "6-Channel mixer 2 Mic / Line inputs\n2 Dual stereo inputs\nHi-Pass filter\n2-Band EQ\nXLR main output\nFX output\nBuilt-in effects device\n1x AUX / FX sends (post)\n8 LED signal display\n48 V Phantom power\nHeadphone jack",
+        "description": "6-Channel mixer 2 Mic / Line inputs, 2 Dual stereo inputs, Hi-Pass filter, 2-Band EQ, XLR main output, FX output, Built-in effects device, 1x AUX / FX sends (post), 8 LED signal display, 48 V Phantom power, Headphone jack",
         "category": "audio_equipment"
     },
     {
@@ -32,7 +32,7 @@
         "title": "Marq 700 Haze Machine",
         "price": "15",
         "description": "The Marq Lighting Haze 700 is a compact hazer with 700 watts of power. With the large 1.2 liter tank with level indicator, the Haze 700 delivers up to 4 hours of haze. The Quick-Ready\u2122 system ensures a particularly fast heat-up time of just 2 minutes. The Haze 700 is controlled via an integrated cable remote control with adjustable intensity. If needed for more than 4 Hours, book additional Fluid.",
-        "category": "lighting_equipment"
+        "category": "stage_equipment"
     },
     {
         "url": "https://twice.shop/superiorsounds1/product/192uEuwl5kAS3tz9AMYH",
@@ -123,14 +123,14 @@
         "title": "Sennheiser XSW 1-835 Dual",
         "price": "40",
         "description": "Sennheiser XSW 1-835 Dual-Vocal Set with 2 835 Handheld Mics (A: 548 to 572 MHz)",
-        "category": "other"
+        "category": "audio_equipment"
     },
     {
         "url": "https://twice.shop/superiorsounds1/product/Th3Kgu68TtZaGIenGY7w",
         "title": "32\" TV Screen",
         "price": "50",
         "description": "32 inch LED TV Screen",
-        "category": "lighting_equipment"
+        "category": "stage_equipment"
     },
     {
         "url": "https://twice.shop/superiorsounds1/product/eT4XUnllAkxeTsqyXxk7",
@@ -172,7 +172,7 @@
         "title": "120\" Projector Screen",
         "price": "130",
         "description": "Large, 120-inch portable projection screen with a 16:9 aspect ratio. Ideal for presentations, movie nights, or event visuals.",
-        "category": "lighting_equipment"
+        "category": "stage_equipment"
     },
     {
         "url": "https://twice.shop/superiorsounds1/product/2iFFgDQ91JlefKYPGKsw",
@@ -193,7 +193,7 @@
         "title": "QSC KW181",
         "price": "100",
         "description": "18-inch, 1000W powered subwoofer with rugged construction and built-in crossover. Ideal for deep, powerful bass reinforcement.",
-        "category": "other"
+        "category": "audio_equipment"
     },
     {
         "url": "https://twice.shop/superiorsounds1/product/uPZzn0Gs0pPlmS0kL6cD",
@@ -221,7 +221,7 @@
         "title": "Pioneer CDJ-2000NXS2",
         "price": "150",
         "description": "Professional multi-player with high-resolution touch screen, advanced browsing, and support for Rekordbox. Industry standard for club DJs.",
-        "category": "stage_equipment"
+        "category": "dj_equipment"
     },
     {
         "url": "https://twice.shop/superiorsounds1/product/cZG2ljjFVE7sOaUgXSAT",
@@ -249,7 +249,7 @@
         "title": "Epson EX5250",
         "price": "20",
         "description": "Compact wireless projector with 3600 lumens brightness and XGA resolution. Ideal for business presentations and video playback.",
-        "category": "video_equipment"
+        "category": "stage_equipment"
     },
     {
         "url": "https://twice.shop/superiorsounds1/product/t5ZkaLRMn2i6z9dToCFa",
@@ -263,7 +263,7 @@
         "title": "Pioneer DJM-S9",
         "price": "120",
         "description": "Two-channel battle mixer designed for Serato DJ. Features performance pads, Magvel Pro crossfader, and customizable effects controls.",
-        "category": "audio_equipment"
+        "category": "dj_equipment"
     },
     {
         "url": "https://twice.shop/superiorsounds1/product/R2N82ZaZoEV8LNW2IcOy",
@@ -326,7 +326,7 @@
         "title": "Photo Booth",
         "price": "700",
         "description": "Photo Booth includes ability for your guests to text or airdrop right after photos are taken. We will send you a google drive with all copies after your event. Attendant not included.",
-        "category": "photo_equipment"
+        "category": "stage_equipment"
     },
     {
         "url": "https://twice.shop/superiorsounds1/product/ghRmWFgK47tExSJNSh1G",
