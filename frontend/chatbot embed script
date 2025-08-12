@@ -116,7 +116,29 @@ app.add_middleware(
     </div>
 
     <!-- The actual chatbot widget -->
-    <div id="chatbot-container" className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden resize">
+    <!-- Wrapper fixed container to position chat in bottom-right -->
+<div id="chatbot-wrapper" style="position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;">
+  <!-- Resizable chat container -->
+  <div 
+    id="chatbot-container" 
+    style="
+      width: 384px; 
+      height: 500px; 
+      background: white; 
+      border-radius: 1rem; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      resize: both;
+      overflow: auto;
+      min-width: 320px;
+      min-height: 300px;
+      max-width: 90vw;
+      max-height: 90vh;
+    "
+  >
+
 
     <script type="text/babel">
         const { useState, useRef, useEffect } = React;
