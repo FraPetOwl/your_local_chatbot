@@ -15,15 +15,6 @@ import logging
 app = FastAPI(debug=True)
 logging.basicConfig(level=logging.DEBUG)
 
-# CORS for frontend dev later
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # adjust in production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 class ChatRequest(BaseModel):
     question: str
 
