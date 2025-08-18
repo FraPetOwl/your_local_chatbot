@@ -4,10 +4,9 @@
 
 import asyncio
 import aiohttp
-import json
 import time
 
-async def test_endpoint(session, question, expected_keywords=None):
+async def test_endpoint(session, question, expected_keywords=None): # session: aiohttp.ClientSession, question: str, expected_keywords: list[str]
     """Test a single question against the chatbot API."""
     print(f"\n🔍 Testing: '{question}'")
     print("-" * 50)
@@ -107,7 +106,7 @@ async def run_tests():
         },
         {
             "question": "Do you have smoke or haze machines?",
-            "expected_keywords": ["smoke", "haze", "machine", "/day"],
+            "expected_keywords": ["smoke", "haze", "machine", "fog","/day"],
             "description": "Effects equipment search"
         },
         {
@@ -129,8 +128,8 @@ async def run_tests():
     
     print("🚀 CHATBOT IMPROVEMENT VALIDATION")
     print("=" * 60)
-    print("Testing the key problem areas from the chat log...\n")
-    
+    print("Testing the key problem areas from the chat log..question.\n")
+
     async with aiohttp.ClientSession() as session:
         passed = 0
         total = len(test_cases)

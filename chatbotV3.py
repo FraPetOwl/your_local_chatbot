@@ -1,5 +1,7 @@
-# chatbotV4_optimized.py
-# Optimized version with better responses and faster performance
+# chatbotV4_optimized.py (filename should be chatbotV3.py)
+# This script implements an optimized chatbot API for Superior Sounds Events using FastAPI and LangChain.
+# It includes enhanced query expansion, intent detection, and improved response generation.
+# It also features better error handling, logging, and streaming responses in order to provide help users to find the right rental equipment.
 
 import uvicorn
 import json
@@ -19,14 +21,16 @@ from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.llms import Ollama
+from llama_cpp import Llama
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("chatbotV4")
+logger = logging.getLogger("chatbotV3")
 
 app = FastAPI(debug=True, title="Superior Sounds Chatbot API", version="4.0.0")
 
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=500)
+    style: str = Field(default="concise", description="Response style preference")
 
 # Initialize components
 embedding = HuggingFaceEmbeddings(
@@ -54,14 +58,13 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
-# Optimized LLM config for speed
-llm = Ollama(
-    model="qwen2.5:0.5b",
-    temperature=0.1,
-    num_predict=300,  # Reduced for speed
-    num_ctx=1024,     # Reduced context for speed
-    repeat_penalty=1.2,
-    timeout=15        # 15 second timeout
+llm = Llama.from_pretrained(
+	repo_id="bartowski/Llama-3.2-3B-Instruct-GGUF",
+	filename="Llama-3.2-3B-Instruct-Q6_K_L.gguf",
+    n_ctx=2048,   # context window size
+    n_threads=8,  # adjust based on CPU cores
+    n_batch=512,  # helps speed up inference
+    verbose=False
 )
 
 # Enhanced synonym expansion with more specific terms
@@ -113,25 +116,28 @@ def detect_query_intent(query: str) -> str:
     else:
         return 'general'
 
+# Enhanced context building with better deduplication and metadata to improve response quality
+
 def build_enhanced_context(docs: List[Document], max_items: int = 6) -> List[dict]:
     """Build enhanced context with better product data."""
     items = []
     seen_titles = set()
     
     for doc in docs:
-        title = doc.metadata.get("title", "").strip()
-        if not title or title.lower() in seen_titles:
-            continue
-        seen_titles.add(title.lower())
         
         price = doc.metadata.get("price", "").strip()
         url = doc.metadata.get("url", "").strip()
         category = doc.metadata.get("category", "").strip()
-        description = doc.metadata.get("description") or doc.page_content or ""
+        description = doc.metadata.get("description") or doc.page_content or "" # description assigned from metadata or page content
         
+        title = doc.metadata.get("title", "").strip() # Avoid empty or duplicate titles
+        if not title or (title.lower(), price) in seen_titles: # if title is empty or already seen, skip
+            continue
+        seen_titles.add(title.lower()) # track seen titles in lowercase for case-insensitive deduplication
+
         # Keep more description for better responses
-        if len(description) > 300:
-            description = description[:297] + "..."
+        if len(description) > 1000:
+            description = description[:997] + "..."
             
         items.append({
             "title": title,
@@ -149,12 +155,12 @@ def build_enhanced_context(docs: List[Document], max_items: int = 6) -> List[dic
 def create_intent_based_prompt(context: List[dict], intent: str) -> str:
     """Create prompts based on query intent for better responses."""
     
-    base_rules = """You are Superior Sounds' rental assistant. RULES:
-1. Use ONLY the products listed below
-2. We rent equipment by the day - mention this clearly
-3. Always include "Book:" followed by the URL when recommending products
-4. Use exact product titles and prices from the data
-5. Be helpful and mention relevant product categories"""
+    base_rules = """You are Superior Sounds' rental assistant. 
+        RULES:
+        1. ONLY recommend products shown between [PRODUCT] blocks.
+        2. Use the exact Title, Price, and URL as provided.
+        3. All rentals are by the day.
+        4. Always include the exact URL from the product section using 'Book: [URL]'."""
 
     intent_instructions = {
         'event_package': 'Suggest multiple items that work well together for the event type.',
@@ -166,7 +172,11 @@ def create_intent_based_prompt(context: List[dict], intent: str) -> str:
     
     instruction = intent_instructions.get(intent, intent_instructions['general'])
     
-    context_json = json.dumps(context, indent=2)
+    # Format context as bullet list instead of JSON
+    product_list_str = "\n".join(
+    f"[PRODUCT]\nTitle: {p['title']}\nPrice: ${p['price']}/day\nCategory: {p['category']}\nURL: {p['url']}\n[/PRODUCT]"
+    for p in context
+)
     
     return f"""{base_rules}
 
@@ -177,7 +187,7 @@ EXAMPLE RESPONSES:
 - "For karaoke nights, you'll need microphones and a mixer. We have the Sennheiser wireless mic ($75/day) and Yamaha mixer ($150/day). Book: [URL1] [URL2]"
 
 PRODUCTS:
-{context_json}"""
+{product_list_str}"""
 
 def create_smart_fallback(products: List[dict], query: str, intent: str) -> str:
     """Create intelligent fallback responses based on intent."""
@@ -253,12 +263,14 @@ def validate_and_enhance_response(response: str, products: List[dict], query: st
         logger.warning("Response used purchase language")
         return None
     
-    # Ensure URLs are properly formatted
-    if products and '[url]' in response_lower:
-        # Replace [URL] placeholders with actual URLs
-        for product in products:
-            if product.get('url'):
-                response = response.replace('[URL]', product['url'], 1)
+     # ✅ Ensure all mentioned product names are in retrieved product set
+    product_titles = [p['title'].lower() for p in products]
+    words_in_response = response_lower.split()
+    for word in words_in_response:
+        if len(word) > 3 and word not in " ".join(product_titles):
+            # Possible hallucination — replace with fallback
+            logger.warning(f"Possible hallucinated product: {word}")
+            return None
     
     return response.strip()
 
@@ -288,7 +300,7 @@ async def chat(req: ChatRequest):
     logger.info(f"📝 Question: {question}")
     
     try:
-        # Detect intent for better responses
+        # Detect intent
         intent = detect_query_intent(question)
         logger.info(f"🎯 Intent: {intent}")
         
@@ -301,62 +313,61 @@ async def chat(req: ChatRequest):
         # Build enhanced context
         products = build_enhanced_context(raw_products, max_items=6)
         
+        #here
         async def stream_response():
             try:
                 if not products:
                     response = "I couldn't find that item in our current inventory. Please try a different search or contact us for more options."
-                else:
-                    # Create intent-based prompt
-                    system_prompt = create_intent_based_prompt(products, intent)
-                    full_prompt = f"{system_prompt}\n\nCustomer: {question}\n\nAssistant:"
-                    
-                    logger.info("🧠 Querying LLM...")
-                    llm_start = time.time()
-                    
-                    try:
-                        # Use invoke with timeout
-                        llm_response = llm.invoke(full_prompt)
-                        llm_time = time.time() - llm_start
-                        logger.info(f"🧠 LLM: {llm_time:.2f}s")
-                        
-                        # Extract response
-                        if hasattr(llm_response, 'content'):
-                            response_text = llm_response.content
-                        else:
-                            response_text = str(llm_response)
-                        
-                        # Validate and enhance
-                        validated = validate_and_enhance_response(response_text, products, question)
-                        
-                        if validated:
-                            response = validated
-                            logger.info("✅ Using LLM response")
-                        else:
-                            response = create_smart_fallback(products, question, intent)
-                            logger.info("⚠️ Using smart fallback")
-                            
-                    except Exception as e:
-                        logger.error(f"LLM error: {e}")
-                        response = create_smart_fallback(products, question, intent)
-                
-                # Stream response with faster timing
-                words = response.split()
-                for i, word in enumerate(words):
-                    yield word + (" " if i < len(words) - 1 else "")
-                    # Faster streaming
-                    if i % 8 == 0:
+                    for word in response.split():
+                        yield word + " "
                         await asyncio.sleep(0.01)
-                        
-            except Exception as e:
+                    return
+
+                # Create intent-based prompt
+                system_prompt = create_intent_based_prompt(products, intent)
+
+                logger.info("🧠 Querying local GGUF model (streaming)...")
+                llm_start = time.time()
+
+                try:
+                    # Stream tokens directly from llama_cpp
+                    for chunk in llm.create_chat_completion(
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": question}
+                        ],
+                        temperature=0.2,
+                        max_tokens=1024,
+                        stream=True
+                    ):
+                        if "choices" in chunk:
+                            delta = chunk["choices"][0]["delta"]
+                            if "content" in delta:
+                                token = delta["content"]
+                                yield token
+                                await asyncio.sleep(0)  # let event loop breathe
+
+                    llm_time = time.time() - llm_start
+                    logger.info(f"🧠 LLM streamed in: {llm_time:.2f}s")
+
+                except Exception as e:
+                    logger.error(f"LLM error: {e}")
+                    fallback = create_smart_fallback(products, question, intent)
+                    for word in fallback.split():
+                        yield word + " "
+                        await asyncio.sleep(0.01)
+
+            except Exception:
                 logger.exception("Streaming error")
                 error_msg = "Sorry, I'm having technical difficulties. Please try again."
                 for word in error_msg.split():
                     yield word + " "
                     await asyncio.sleep(0.01)
         
+        # Return the stream to client
         return StreamingResponse(stream_response(), media_type="text/plain")
         
-    except Exception as e:
+    except Exception:
         logger.exception("Chat endpoint error")
         raise HTTPException(status_code=500, detail="Internal server error")
     finally:
@@ -368,17 +379,8 @@ async def health_check():
     return {
         "status": "healthy",
         "version": "4.0.0-optimized",
-        "model": "qwen2.5:0.5b"
-    }
-
-@app.get("/widget-config") 
-async def widget_config():
-    return {
-        "api_endpoint": "http://localhost:8000",
-        "brand_name": "Superior Sounds",
-        "brand_color": "#7c3aed",
-        "welcome_message": "👋 Hi! I'm here to help you find the perfect sound and lighting equipment for your event. What are you planning?"
+        "model": "Llama-3.2-3B-Instruct-Q6_K.gguf"
     }
 
 if __name__ == "__main__":
-    uvicorn.run("chatbotV4_optimized:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("chatbotV3:app", host="127.0.0.1", port=8000, reload=True)
