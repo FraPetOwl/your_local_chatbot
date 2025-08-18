@@ -1,18 +1,25 @@
 {
-  "name": "product-chat-frontend",
+  "name": "superior-sounds-chatbot-demo",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "AI-powered chatbot widget for equipment rental businesses",
   "scripts": {
-    "start": "parcel index.html",
-    "build": "parcel build index.html --dist-dir build"
+    "build": "parcel build index.html --dist-dir build",
+    "dev": "python -m http.server 3000",
+    "start": "npm run build"
   },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-markdown": "^10.1.0",
-    "re-resizable": "^6.11.2"
-  },
+  "keywords": [
+    "chatbot",
+    "ai",
+    "rental",
+    "equipment",
+    "react",
+    "widget"
+  ],
+  "author": "Peter Fraser",
+  "license": "MIT",
   "devDependencies": {
-    "parcel": "^2.9.3"
+    "copyfiles": "^2.4.1",
+    "mkdirp": "^3.0.1",
+    "rimraf": "^6.0.1"
   }
 }

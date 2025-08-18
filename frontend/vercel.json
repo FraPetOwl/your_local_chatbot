@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "superior-sounds-chatbot-demo",
+  "builds": [
+    {
+      "src": "chatbot-embed.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/chatbot-embed.html"
+    }
+  ]
+}
