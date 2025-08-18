@@ -1,0 +1,24 @@
+# Node.js dependencies
+node_modules/
+
+# Parcel build output
+dist/
+build/
+
+# Parcel cache
+.cache/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files (if you add any)
+.env
+.env.local
+.env.production
+.env.development
