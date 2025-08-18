@@ -1,4 +1,5 @@
 <!-- This page is a demo HTML page showcasing how to embed the chatbot widget on any website. -->
+ <!-- The chatbot widget is designed to be easily integrated into various platforms including HTML, React, and WordPress. -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -344,6 +345,8 @@ app.add_middleware(
                         </div>
                         <p className="text-xs text-gray-500 mt-2 text-center">
                             Powered by Superior Sounds AI
+                            <br />                    
+                            Please check important info as chatbot accuracy may vary.
                         </p>
                     </div>
                 </div>
