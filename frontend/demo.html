@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superior Sounds - AI Equipment Rental Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-purple-900">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-white mb-4">Superior Sounds</h1>
+            <p class="text-2xl text-white/80 mb-8">AI-Powered Equipment Rental Assistant</p>
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-2xl mx-auto">
+                <p class="text-white/90 text-lg leading-relaxed">
+                    Experience the future of equipment rental with our intelligent chatbot. 
+                    Get instant recommendations for speakers, lighting, DJ equipment, and more. 
+                    Our AI assistant understands your event needs and suggests the perfect equipment package.
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Feature Cards -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white">
+                <div class="text-3xl mb-4">🎵</div>
+                <h3 class="text-xl font-semibold mb-2">Sound Systems</h3>
+                <p class="text-white/80">Professional speakers, amplifiers, and audio equipment for any event size.</p>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white">
+                <div class="text-3xl mb-4">💡</div>
+                <h3 class="text-xl font-semibold mb-2">Lighting Solutions</h3>
+                <p class="text-white/80">Stage lighting, LED panels, and special effects for memorable events.</p>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white">
+                <div class="text-3xl mb-4">🎧</div>
+                <h3 class="text-xl font-semibold mb-2">DJ Equipment</h3>
+                <p class="text-white/80">Complete DJ setups with mixers, turntables, and professional audio gear.</p>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-white mb-4">Try Our AI Assistant</h2>
+                <p class="text-white/80 text-lg mb-6">
+                    Click the chat button in the bottom right corner to start a conversation with our AI assistant. 
+                    Ask about equipment recommendations, pricing, availability, or any questions about your event setup.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <span class="bg-white/20 text-white px-4 py-2 rounded-full text-sm">"What speakers do I need for a wedding?"</span>
+                    <span class="bg-white/20 text-white px-4 py-2 rounded-full text-sm">"Show me lighting options for a corporate event"</span>
+                    <span class="bg-white/20 text-white px-4 py-2 rounded-full text-sm">"DJ equipment for a birthday party"</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Widget Container -->
+    <div id="chatbot-container"></div>
+
+    <!-- Load the new Bolt widget -->
+    <script type="module">
+        import ChatWidget from './src/bolt-chat/index.tsx';
+        import React from 'react';
+        import ReactDOM from 'react-dom/client';
+        
+        // Initialize the Bolt chat widget
+        const container = document.getElementById('chatbot-container');
+        if (container) {
+            const root = ReactDOM.createRoot(container);
+            root.render(React.createElement(ChatWidget, {
+                apiUrl: 'http://localhost:8000/chat',
+                theme: {
+                    primary: '#2563EB',
+                    background: '#FFFFFF',
+                    text: '#1F2937'
+                },
+                draggable: true,
+                resizable: true,
+                initialPosition: { x: window.innerWidth - 420, y: 20 },
+                initialSize: { width: 400, height: 500 }
+            }));
+        }
+    </script>
+</body>
+</html>

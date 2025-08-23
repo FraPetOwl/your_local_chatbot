@@ -1,4 +1,4 @@
-# chatbotV4_optimized.py (filename should be chatbotV3.py)
+# chatbotV3.py
 # This script implements an optimized chatbot API for Superior Sounds Events using FastAPI and LangChain.
 # It includes enhanced query expansion, intent detection, and improved response generation.
 # It also features better error handling, logging, and streaming responses in order to provide help users to find the right rental equipment.
@@ -21,12 +21,19 @@ from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.llms import Ollama
-from llama_cpp import Llama
+try:
+    from llama_cpp import Llama
+except Exception:
+    Llama = None
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("chatbotV3")
 
 app = FastAPI(debug=True, title="Superior Sounds Chatbot API", version="4.0.0")
+
+# Resolve important paths relative to this file for portability (local/dev/deploy)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CHROMA_DIR = os.path.join(BASE_DIR, "chroma_db")
 
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=500)
@@ -40,11 +47,15 @@ embedding = HuggingFaceEmbeddings(
 )
 
 try:
-    db = Chroma(
-        persist_directory="./chroma_db",
-        embedding_function=embedding
-    )
+    db = Chroma(persist_directory=CHROMA_DIR, embedding_function=embedding)
+
     logger.info("✅ Database loaded successfully")
+    import sys, os
+    logger.info(f"Python exec: {sys.executable}")
+    logger.info(f"Using Chroma persist_directory: {CHROMA_DIR}, count: {getattr(db._collection, 'count', lambda: 'unknown')()}")
+
+
+
 except Exception as e:
     logger.error(f"❌ Failed to load database: {e}")
     raise
@@ -58,14 +69,30 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
-llm = Llama.from_pretrained(
-	repo_id="bartowski/Llama-3.2-3B-Instruct-GGUF",
-	filename="Llama-3.2-3B-Instruct-Q6_K_L.gguf",
-    n_ctx=2048,   # context window size
-    n_threads=8,  # adjust based on CPU cores
-    n_batch=512,  # helps speed up inference
-    verbose=False
-)
+# Optional LLM toggle via env var (set LLM_ENABLED=0 to force fallback-only)
+LLM_ENABLED = os.getenv("LLM_ENABLED", "1").strip() not in ("0", "false", "False")
+llm_model_filename = os.getenv("LLM_GGUF_FILENAME", "Llama-3.2-3B-Instruct-Q6_K_L.gguf")
+llm_repo_id = os.getenv("LLM_REPO_ID", "bartowski/Llama-3.2-3B-Instruct-GGUF")
+
+llm_threads = int(os.getenv("LLM_THREADS", "8"))
+llm_batch = int(os.getenv("LLM_BATCH", "512"))
+llm_ctx = int(os.getenv("LLM_CTX", "2048"))
+
+llm = None
+if LLM_ENABLED and Llama is not None:
+    try:
+        llm = Llama.from_pretrained(
+            repo_id=llm_repo_id,
+            filename=llm_model_filename,
+            n_ctx=llm_ctx,
+            n_threads=llm_threads,
+            n_batch=llm_batch,
+            verbose=False
+        )
+        logger.info(f"LLM loaded: repo_id={llm_repo_id}, filename={llm_model_filename}")
+    except Exception as e:
+        logger.error(f"Failed to initialize LLM: {e}")
+        llm = None
 
 # Enhanced synonym expansion with more specific terms
 SYNONYM_EXPANSIONS = {
@@ -313,7 +340,7 @@ async def chat(req: ChatRequest):
         # Build enhanced context
         products = build_enhanced_context(raw_products, max_items=6)
         
-        #here
+        
         async def stream_response():
             try:
                 if not products:
@@ -326,36 +353,43 @@ async def chat(req: ChatRequest):
                 # Create intent-based prompt
                 system_prompt = create_intent_based_prompt(products, intent)
 
-                logger.info("🧠 Querying local GGUF model (streaming)...")
-                llm_start = time.time()
-
-                try:
-                    # Stream tokens directly from llama_cpp
-                    for chunk in llm.create_chat_completion(
-                        messages=[
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": question}
-                        ],
-                        temperature=0.2,
-                        max_tokens=1024,
-                        stream=True
-                    ):
-                        if "choices" in chunk:
-                            delta = chunk["choices"][0]["delta"]
-                            if "content" in delta:
-                                token = delta["content"]
-                                yield token
-                                await asyncio.sleep(0)  # let event loop breathe
-
-                    llm_time = time.time() - llm_start
-                    logger.info(f"🧠 LLM streamed in: {llm_time:.2f}s")
-
-                except Exception as e:
-                    logger.error(f"LLM error: {e}")
+                if llm is None:
+                    logger.info("🧠 Using fallback response (LLM disabled)...")
                     fallback = create_smart_fallback(products, question, intent)
                     for word in fallback.split():
                         yield word + " "
                         await asyncio.sleep(0.01)
+                else:
+                    logger.info("🧠 Querying local GGUF model (streaming)...")
+                    llm_start = time.time()
+
+                    try:
+                        # Stream tokens directly from llama_cpp
+                        for chunk in llm.create_chat_completion(
+                            messages=[
+                                {"role": "system", "content": system_prompt},
+                                {"role": "user", "content": question}
+                            ],
+                            temperature=0.2,
+                            max_tokens=1024,
+                            stream=True
+                        ):
+                            if "choices" in chunk:
+                                delta = chunk["choices"][0]["delta"]
+                                if "content" in delta:
+                                    token = delta["content"]
+                                    yield token
+                                    await asyncio.sleep(0)  # let event loop breathe
+
+                        llm_time = time.time() - llm_start
+                        logger.info(f"🧠 LLM streamed in: {llm_time:.2f}s")
+
+                    except Exception as e:
+                        logger.error(f"LLM error: {e}")
+                        fallback = create_smart_fallback(products, question, intent)
+                        for word in fallback.split():
+                            yield word + " "
+                            await asyncio.sleep(0.01)
 
             except Exception:
                 logger.exception("Streaming error")
@@ -379,8 +413,31 @@ async def health_check():
     return {
         "status": "healthy",
         "version": "4.0.0-optimized",
-        "model": "Llama-3.2-3B-Instruct-Q6_K.gguf"
+        "model": "Llama-3.2-3B-Instruct-Q6_K_L.gguf",
+        "database_loaded": db._collection.count() if hasattr(db._collection, "count") else "unknown"
     }
+
+@app.get("/debug-chroma-info")
+def debug_chroma_info():
+    import os
+    coll = getattr(db, "_collection", None)
+    info = {
+        "persist_dir": os.path.abspath("./chroma_db"),
+        "collection_type": str(type(coll)),
+        "has_count": hasattr(coll, "count")
+    }
+    try:
+        info["count"] = coll.count()
+    except Exception as e:
+        info["count_error"] = str(e)
+    try:
+        rows = coll.get(limit=1)
+        info["sample_keys"] = list(rows.keys())
+        info["sample_meta"] = rows.get("metadatas", rows.get("metadata", []))[:1]
+    except Exception as e:
+        info["sample_error"] = str(e)
+    return info
+
 
 if __name__ == "__main__":
     uvicorn.run("chatbotV3:app", host="127.0.0.1", port=8000, reload=True)

@@ -60,7 +60,7 @@ if os.path.exists(db_dir):
 
 # --- STEP 2: Load product data from JSON ---
 try:
-    with open("categorized_products.json", "r", encoding="utf-8") as f:
+    with open("./categorized_products.json", "r", encoding="utf-8") as f:
         data = json.load(f)
     print(f"📁 Loaded {len(data)} items from categorized_products.json")
 except FileNotFoundError:

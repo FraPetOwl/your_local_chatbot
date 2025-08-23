@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Widget Comparison - Superior Sounds</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-purple-900">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">Chat Widget Comparison</h1>
+            <p class="text-white/80 text-lg">Testing both widgets side by side</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Current Widget -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Current Widget</h2>
+                <p class="text-gray-600 mb-4">Your existing implementation</p>
+                <div id="current-widget" class="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[400px]">
+                    <p class="text-gray-500 text-center">Current widget will appear here</p>
+                </div>
+            </div>
+
+            <!-- New Bolt Widget -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">New Bolt Widget</h2>
+                <p class="text-gray-600 mb-4">Professional Bolt implementation</p>
+                <div id="bolt-widget" class="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[400px]">
+                    <p class="text-gray-500 text-center">Bolt widget will appear here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Comparison -->
+        <div class="bg-white rounded-lg p-6 shadow-lg">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Features Comparison</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Current Widget</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                            Basic functionality
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                            Streaming responses
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-gray-300 rounded-full mr-2"></span>
+                            Limited UI features
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-gray-300 rounded-full mr-2"></span>
+                            Basic styling
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Bolt Widget</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                            Professional UI
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                            Draggable & Resizable
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                            Minimize/Maximize
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                            Clear History
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                            Local Storage
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                            Better Error Handling
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load the widgets -->
+    <script type="module">
+        // Import the new Bolt widget
+        import ChatWidget from './src/bolt-chat/index.tsx';
+        
+        // Import the current widget (you'll need to adjust this path)
+        // import { embedChatbot } from './src/react-chatbot-widget.jsx';
+        
+        // Initialize Bolt widget
+        const boltContainer = document.getElementById('bolt-widget');
+        if (boltContainer) {
+            const root = ReactDOM.createRoot(boltContainer);
+            root.render(React.createElement(ChatWidget, {
+                apiUrl: 'http://localhost:8000/chat',
+                theme: {
+                    primary: '#2563EB',
+                    background: '#FFFFFF',
+                    text: '#1F2937'
+                },
+                draggable: true,
+                resizable: true,
+                initialPosition: { x: 20, y: 20 },
+                initialSize: { width: 400, height: 500 }
+            }));
+        }
+        
+        // Initialize current widget (commented out for now)
+        // embedChatbot('current-widget', { apiEndpoint: 'http://localhost:8000' });
+    </script>
+</body>
+</html>
