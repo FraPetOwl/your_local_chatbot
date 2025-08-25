@@ -1,12 +1,18 @@
 # Node.js dependencies
 node_modules/
 
-# Parcel build output
+# Parcel build output / cache directories
 dist/
 build/
-
-# Parcel cache
 .cache/
+.parcel-cache/
+frontend/.parcel-cache/
+frontend/build/
+frontend/dist/
+node_modules/
+.venv/
+__pycache__/
+*.pyc
 
 # System files
 .DS_Store
