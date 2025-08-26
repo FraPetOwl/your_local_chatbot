@@ -2,6 +2,7 @@
 # Optimized version of your chatbotV3.py for faster responses on CPU-only machines.
 # Key changes are commented inline. 
 # start with uvicorn chatbotV3_optimized:app --reload --port 8000
+# model download command:  hf download bartowski/Llama-3.2-3B-Instruct-GGUF Llama-3.2-3B-Instruct-Q4_K_S.gguf
 
 import uvicorn
 import json
@@ -45,8 +46,8 @@ class ChatRequest(BaseModel):
 # Use env vars or defaults tuned for your laptop CPU. Adjust if you know your physical cores.
 CPU_CORES = int(os.getenv("CPU_CORES", "6"))  # conservative default for laptop to leave headroom
 LLM_THREADS = int(os.getenv("LLM_THREADS", str(max(1, CPU_CORES))))
-LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "512"))  # reduce token budget for speed
-LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "45.0"))  # enforce a fast timeout
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "150"))  # reduce token budget for speed
+LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "90.0"))  # enforce a fast timeout
 LLM_CONCURRENCY = int(os.getenv("LLM_CONCURRENCY", "1"))  # limit concurrent LLM inferences
 
 # ThreadPool for blocking operations (LLM + sync Chroma)
@@ -83,8 +84,8 @@ app.add_middleware(
 
 # ========== LLM init (tune threads) ==========
 LLM_ENABLED = os.getenv("LLM_ENABLED", "1").strip() not in ("0", "false", "False")
-llm_model_filename = os.getenv("LLM_GGUF_FILENAME", "Llama-3.2-3B-Instruct-Q4_K_M.gguf")
 llm_repo_id = os.getenv("LLM_REPO_ID", "bartowski/Llama-3.2-3B-Instruct-GGUF")
+llm_model_filename = os.getenv("LLM_GGUF_FILENAME", "Llama-3.2-3B-Instruct-Q4_K_S.gguf")
 
 llm = None
 if LLM_ENABLED and Llama is not None:
@@ -93,12 +94,12 @@ if LLM_ENABLED and Llama is not None:
         llm = Llama.from_pretrained(
             repo_id=llm_repo_id,
             filename=llm_model_filename,
-            n_ctx=int(os.getenv("LLM_CTX", "2048")),
+            n_ctx=int(os.getenv("LLM_CTX", "1024")),
             n_threads=LLM_THREADS,
             n_batch=int(os.getenv("LLM_BATCH", "32")),  # smaller batch to reduce memory spikes
             verbose=False
         )
-        logger.info(f"LLM loaded: repo_id={llm_repo_id}, filename={llm_model_filename}, threads={LLM_THREADS}")
+        logger.info(f"✅ LLM loaded successfully: repo_id={llm_repo_id}, filename={llm_model_filename}, threads={LLM_THREADS}")
     except Exception as e:
         logger.error(f"Failed to initialize LLM: {e}")
         llm = None
@@ -229,44 +230,60 @@ async def search_products(question: str, k: int = 12) -> List[Document]:
         return []
 
 # ========== Synchronous helper to run llama streaming inside executor ==========
-def _llm_stream_to_text(system_prompt: str, user_question: str, max_tokens: int = LLM_MAX_TOKENS):
-    """
-    Synchronous wrapper that consumes llama_cpp streaming generator and returns a joined string.
-    Running inside ThreadPoolExecutor to avoid blocking asyncio loop.
-    """
-    if llm is None:
-        return None
-    out_chunks = []
-    # Use the non-streaming interface if your llama_cpp supports it, otherwise consume the stream quickly.
-    for chunk in llm.create_chat_completion(
-        messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_question}],
-        temperature=0.2,
-        max_tokens=max_tokens,
-        stream=True
-    ):
-        if "choices" in chunk:
-            delta = chunk["choices"][0].get("delta", {})
-            if "content" in delta:
-                out_chunks.append(delta["content"])
-    return "".join(out_chunks)
+# Replace your _llm_stream_to_text and call_llm_with_timeout functions with these:
 
-async def call_llm_with_timeout(system_prompt: str, user_question: str, timeout: float = LLM_TIMEOUT_SECONDS):
-    """
-    Run the blocking LLM call inside executor with a timeout, respecting the semaphore concurrency limit.
-    Returns string or None on timeout/error.
-    """
+def _simple_llm_call(system_prompt: str, user_question: str, max_tokens: int = LLM_MAX_TOKENS):
+    """Simple synchronous LLM call without streaming - runs in thread"""
     if llm is None:
         return None
+    
+    try:
+        logger.info("Making direct LLM call...")
+        start = time.time()
+        
+        response = llm.create_chat_completion(
+            messages=[
+                {"role": "system", "content": system_prompt}, 
+                {"role": "user", "content": user_question}
+            ],
+            temperature=0.2,
+            max_tokens=max_tokens,
+            stream=False  # No streaming to avoid complexity
+        )
+        
+        elapsed = time.time() - start
+        logger.info(f"LLM call completed in {elapsed:.2f}s")
+        
+        if "choices" in response and len(response["choices"]) > 0:
+            content = response["choices"][0]["message"]["content"]
+            logger.info(f"LLM returned: '{content[:100]}...' (length: {len(content)})")
+            return content
+        else:
+            logger.error(f"Invalid LLM response format: {response}")
+            return None
+            
+    except Exception as e:
+        logger.error(f"LLM call failed: {e}")
+        return None
+
+async def call_llm_with_timeout(system_prompt: str, user_question: str, timeout: float = 30.0):
+    """Simplified async wrapper - let LLM run without timeout since we know it works"""
+    if llm is None:
+        logger.warning("LLM is None")
+        return None
+    
     loop = asyncio.get_running_loop()
-    async with LLM_SEMAPHORE:
-        try:
-            return await asyncio.wait_for(loop.run_in_executor(EXECUTOR, functools.partial(_llm_stream_to_text, system_prompt, user_question)), timeout=timeout)
-        except asyncio.TimeoutError:
-            logger.warning("LLM call timed out")
-            return None
-        except Exception as e:
-            logger.error(f"LLM call failed: {e}")
-            return None
+    
+    try:
+        logger.info("Starting LLM call in executor...")
+        # Run in thread WITHOUT timeout - let it complete naturally
+        result = await loop.run_in_executor(None, _simple_llm_call, system_prompt, user_question)
+        logger.info(f"LLM executor completed successfully")
+        return result
+        
+    except Exception as e:
+        logger.error(f"LLM executor error: {e}")
+        return None
 
 # ========== API endpoint with optimized flow ==========
 @app.post("/chat")
@@ -307,7 +324,8 @@ async def chat(req: ChatRequest):
         # Try LLM but with timeout and fallback
         logger.info("🧠 Starting LLM call (with timeout)...")
         llm_start = time.time()
-        text = await call_llm_with_timeout(system_prompt, question, timeout=LLM_TIMEOUT_SECONDS)
+        text = await call_llm_with_timeout(system_prompt, question, timeout=30.0)
+        logger.info(f"LLM result: text={text is not None}, length={len(text) if text else 0}")
         llm_elapsed = time.time() - llm_start
         logger.info(f"LLM call finished in {llm_elapsed:.2f}s (text length: {len(text) if text else 0})")
 
