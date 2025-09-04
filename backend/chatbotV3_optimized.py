@@ -1,12 +1,9 @@
-# chatbotV3_optimized.py
-# Optimized version of your chatbotV3.py for faster responses on CPU-only machines.
-# Key changes are commented inline. 
-# start with uvicorn chatbotV3_optimized:app --reload --port 8000
-# model download command:  hf download bartowski/Llama-3.2-3B-Instruct-GGUF Llama-3.2-3B-Instruct-Q4_K_S.gguf
+# chatbotV4_optimized.py
+# Optimized, streaming-safe version
+# Start with: uvicorn chatbotV4_optimized:app --reload --port 8000
 
 import uvicorn
 import json
-import re
 import time
 import asyncio
 import os
@@ -15,12 +12,11 @@ from typing import List, Dict, Optional
 import concurrent.futures
 import functools
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-# langchain / llama imports (same as before)
 from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -31,32 +27,54 @@ except Exception:
     Llama = None
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("chatbotV3_opt")
+logger = logging.getLogger("chatbotV3_optimized")
 
-app = FastAPI(debug=True, title="Superior Sounds Chatbot API", version="4.0.0")
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CHROMA_DIR = os.path.join(BASE_DIR, "chroma_db")
+app = FastAPI(title="Superior Sounds Chatbot", version="4.0")
 
 class ChatRequest(BaseModel):
-    question: str = Field(..., min_length=1, max_length=500)
-    style: str = Field(default="concise", description="Response style preference")
+    question: str = Field(..., min_length=1, max_length=800)
 
-# ========== Performance Tunables ==========
-# Use env vars or defaults tuned for your laptop CPU. Adjust if you know your physical cores.
-CPU_CORES = int(os.getenv("CPU_CORES", "6"))  # conservative default for laptop to leave headroom
-LLM_THREADS = int(os.getenv("LLM_THREADS", str(max(1, CPU_CORES))))
-LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "150"))  # reduce token budget for speed
-LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "90.0"))  # enforce a fast timeout
-LLM_CONCURRENCY = int(os.getenv("LLM_CONCURRENCY", "1"))  # limit concurrent LLM inferences
+# CONFIG
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CHROMA_DIR = os.path.join(BASE_DIR, "chroma_db")
+EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=2)
 
-# ThreadPool for blocking operations (LLM + sync Chroma)
-EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=LLM_CONCURRENCY + 2)
+# SMART CANNED RESPONSES, this is for common questions we can answer without LLM
+CANNED_RESPONSES = {
+    'wireless mic': {
+        'intro': "Here are our wireless microphone options:",
+        'products': ['Sennheiser XSW 1-825 Wireless Microphone', 'Sennheiser XSW 1-835 Dual', 'Shure SLXD24D/SM58 Dual']
+    },
+    'dj speaker': {
+        'intro': "Here are our DJ speaker options:",
+        'products': ['QSC K10', 'QSC K12', 'QSC-KW122']
+    },
+    'moving head': {
+        'intro': "Here are our moving head lighting options:",
+        'products': ['Chauvet Intimidator Spot 350', 'Chauvet Intimidator Hybrid 140SR']
+    },
+    'haze machine': {
+        'intro': "Here are our haze and fog machines:",
+        'products': ['Marq 700 Haze Machine']
+    },
+    'karaoke': {
+        'intro': "Perfect for karaoke! Here's what you need:",
+        'products': ['Sennheiser XSW 1-825 Wireless Microphone', 'QSC K10', 'Allen & Heath Zed-10FX']
+    },
+    'retirement party': {
+        'intro': "For a large retirement party, consider these options:",
+        'products': ['QSC K12', 'Chauvet Intimidator Spot 350', 'Allen & Heath Zed-10FX', 'Photo Booth']
+    }
+}
 
-# Semaphore to limit concurrent LLM usage and avoid CPU thrash
-LLM_SEMAPHORE = asyncio.Semaphore(LLM_CONCURRENCY)
+POLICY_RESPONSES = {
+    "delivery": "We offer delivery! Please contact us for details and pricing.",
+    "warranty": "All rentals are professionally maintained. Please ask staff about warranty policies.",
+    "sell": "Superior Sounds only offers rentals and service for party needs - we do not sell any products.",
+    "t-shirt": "We do not offer clothing or merchandise at this time."
+}
 
-# ========== Embeddings & DB (unchanged but run sync search in executor) ==========
+# DATABASE SETUP
 embedding = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
     model_kwargs={'device': 'cpu'},
@@ -65,290 +83,208 @@ embedding = HuggingFaceEmbeddings(
 
 try:
     db = Chroma(persist_directory=CHROMA_DIR, embedding_function=embedding)
-    logger.info("✅ Database loaded successfully")
-    import sys
-    logger.info(f"Python exec: {sys.executable}")
-    logger.info(f"Using Chroma persist_directory: {CHROMA_DIR}, count: {getattr(db._collection, 'count', lambda: 'unknown')()}")
+    logger.info("✅ Database loaded")
 except Exception as e:
-    logger.error(f"❌ Failed to load database: {e}")
+    logger.error(f"❌ Database error: {e}")
     raise
 
-# ========== CORS (keep safe dev settings) ==========
+# LLM SETUP
+llm = None
+if os.getenv("LLM_ENABLED", "1") != "0" and Llama is not None:
+    try:
+        llm = Llama.from_pretrained(
+            repo_id="HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF",
+            filename="smollm2-1.7b-instruct-q4_k_m.gguf",
+            n_ctx=1024,
+            n_threads=2,
+            verbose=False
+        )
+        logger.info("✅ LLM loaded")
+    except Exception as e:
+        logger.error(f"LLM failed: {e}")
+        llm = None
+
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # change to your frontend origin; do NOT use "*" with credentials=True
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ========== LLM init (tune threads) ==========
-LLM_ENABLED = os.getenv("LLM_ENABLED", "1").strip() not in ("0", "false", "False")
-llm_repo_id = os.getenv("LLM_REPO_ID", "bartowski/Llama-3.2-3B-Instruct-GGUF")
-llm_model_filename = os.getenv("LLM_GGUF_FILENAME", "Llama-3.2-3B-Instruct-Q4_K_S.gguf")
-
-llm = None
-if LLM_ENABLED and Llama is not None:
-    try:
-        # Use LLM_THREADS derived from CPU_CORES
-        llm = Llama.from_pretrained(
-            repo_id=llm_repo_id,
-            filename=llm_model_filename,
-            n_ctx=int(os.getenv("LLM_CTX", "1024")),
-            n_threads=LLM_THREADS,
-            n_batch=int(os.getenv("LLM_BATCH", "32")),  # smaller batch to reduce memory spikes
-            verbose=False
+# HELPERS
+def format_response(intro: str, products: List[dict]) -> str:
+    response = intro + "\n\n"
+    for p in products[:6]:
+        title = p.get('title', 'Unknown')
+        price = p.get('price', 'N/A')
+        url = p.get('url', 'https://twice.shop/superiorsounds1/shop')
+        desc = p.get('description', 'rental equipment')
+        
+        response += (
+            f"## • **{title}**"
+            f" *(${price}/day)* " 
+            f"📝*Details:* {desc} "
+            f"[Book below👇]{url}\n"
         )
-        logger.info(f"✅ LLM loaded successfully: repo_id={llm_repo_id}, filename={llm_model_filename}, threads={LLM_THREADS}")
-    except Exception as e:
-        logger.error(f"Failed to initialize LLM: {e}")
-        llm = None
-
-# ========== Your helpers (unchanged except comments) ==========
-SYNONYM_EXPANSIONS = {
-    # ... same as your dictionary ...
-    'microphone': 'microphone mic vocal handheld wireless Sennheiser Shure audio',
-    'mic': 'microphone mic vocal handheld wireless Sennheiser audio',
-    'wireless mic': 'wireless microphone handheld vocal cordless Sennheiser',
-    'speaker': 'speaker speakers sound audio PA system QSC JBL Alto DJ monitor',
-    'speakers': 'speakers speaker sound audio PA system monitors QSC JBL',
-    'dj speaker': 'DJ speaker sound system PA speakers QSC JBL powered',
-    'lights': 'lighting lights LED uplight spotlight wash color Chauvet Rockville',
-    'lighting': 'lighting lights LED uplight spotlight wash color Chauvet',
-    'uplight': 'uplight LED color wash ambient lighting Rockville uplights',
-    'moving head': 'moving head spot wash beam Intimidator Hybrid light lighting',
-    'dj': 'DJ disc jockey turntable mixer Pioneer Yamaha controller deck',
-    'smoke': 'smoke fog haze machine atmosphere effect Marq',
-    'fog': 'fog smoke haze machine atmosphere effect',
-    'haze': 'haze fog smoke machine atmosphere effect Marq',
-    'wedding': 'wedding reception ceremony event party celebration outdoor',
-    'outdoor': 'outdoor outside garden patio event weather resistant',
-    'karaoke': 'karaoke vocal microphone mixer music entertainment PA system',
-    'party': 'party celebration event reception gathering dance DJ',
-    'audio': 'audio sound PA system speakers microphone amplifier mixer'
-}
-
-def expand_query(query: str) -> str:
-    expanded_terms = [query.lower()]
-    ql = query.lower()
-    for term, expansion in SYNONYM_EXPANSIONS.items():
-        if term in ql:
-            expanded_terms.append(expansion)
-    return ' '.join(expanded_terms)
-
-def detect_query_intent(query: str) -> str:
-    ql = query.lower()
-    if any(word in ql for word in ['karaoke', 'party', 'wedding', 'event', 'corporate']):
-        return 'event_package'
-    elif any(word in ql for word in ['recommend', 'suggest', 'need', 'what would', 'complete']):
-        return 'recommendation'
-    elif any(word in ql for word in ['affordable', 'cheap', 'budget', 'least expensive']):
-        return 'budget_focused'
-    elif any(word in ql for word in ['do you have', 'which', 'what', 'show me']):
-        return 'product_search'
-    else:
-        return 'general'
-
-def build_enhanced_context(docs: List[Document], max_items: int = 6) -> List[dict]:
-    items = []
-    seen_titles = set()
-    for doc in docs:
-        price = doc.metadata.get("price", "").strip()
-        url = doc.metadata.get("url", "").strip()
-        category = doc.metadata.get("category", "").strip()
-        description = doc.metadata.get("description") or doc.page_content or ""
-        title = doc.metadata.get("title", "").strip()
-        if not title or (title.lower(), price) in seen_titles:
-            continue
-        seen_titles.add(title.lower())
-        # REDUCTION: shorten description to speed token count
-        if len(description) > 300:
-            description = description[:297] + "..."
-        items.append({"title": title, "price": price, "description": description, "url": url, "category": category})
-        if len(items) >= max_items:
-            break
-    return items
-
-def create_intent_based_prompt(context: List[dict], intent: str) -> str:
-    base_rules = """You are Superior Sounds' rental assistant.
-RULES:
-1. ONLY recommend products shown between [PRODUCT] blocks.
-2. Use the exact Title, Price, and URL as provided.
-3. All rentals are by the day.
-4. Always include the exact URL from the product section using 'Book: [URL]'."""
-    intent_instructions = {
-        'event_package': 'Suggest multiple items that work well together for the event type.',
-        'recommendation': 'Provide detailed recommendations with reasoning.',
-        'budget_focused': 'Highlight the most affordable options and mention prices clearly.',
-        'product_search': 'List relevant products with key details and booking links.',
-        'general': 'Be helpful and informative about our rental inventory.'
-    }
-    instruction = intent_instructions.get(intent, intent_instructions['general'])
-    # LIMIT context size: small product list string to reduce prompt tokens
-    product_list_str = "\n".join(
-        f"[PRODUCT]\nTitle: {p['title']}\nPrice: ${p['price']}/day\nCategory: {p['category']}\nURL: {p['url']}\n[/PRODUCT]"
-        for p in context[:4]  # reduce to top-4 products
-    )
-    return f"{base_rules}\n\n{instruction}\n\nPRODUCTS:\n{product_list_str}"
-
-def create_smart_fallback(products: List[dict], query: str, intent: str) -> str:
-    # unchanged fallback but short and fast
-    if not products:
-        return "I couldn't find that specific item in our current inventory. Please try a different search or contact us."
-    # ... same logic but shorter outputs ...
-    lines = []
-    for item in products[:3]:
-        title = item.get('title', 'Unknown')
-        price = item.get('price', 'Call')
-        url = item.get('url', '')
-        lines.append(f"{title} - ${price}/day. Book: {url}")
-    return "\n".join(lines)
-
-def validate_and_enhance_response(response: str, products: List[dict], query: str) -> Optional[str]:
-    if not response or len(response.strip()) < 15:
-        return None
-    response_lower = response.lower()
-    banned = ['yuan', 'rmb', 'amazon', 'ebay', 'purchase online', 'buy it', 'for sale']
-    if any(term in response_lower for term in banned):
-        logger.warning("Response contained banned terms")
-        return None
-    # lightweight hallucination guard: skip heavy token-level checks for speed
     return response.strip()
 
-# ========== Make Chroma search non-blocking (run in executor) ==========
-async def search_products(question: str, k: int = 12) -> List[Document]:
-    """Run the synchronous Chroma similarity_search in a threadpool to avoid blocking event loop."""
-    expanded = expand_query(question)
+def get_canned_response(query: str) -> Optional[tuple]:
+    query_lower = query.lower()
+    for key, data in CANNED_RESPONSES.items():
+        if key in query_lower:
+            return data['intro'], data['products']
+    for key, reply in POLICY_RESPONSES.items():
+        if key in query_lower:
+            return reply, None
+    return None
+
+async def search_products(query: str, k: int = 6) -> List[dict]:
     loop = asyncio.get_running_loop()
-    start = time.time()
     try:
-        results = await loop.run_in_executor(EXECUTOR, functools.partial(db.similarity_search, expanded, k))
-        logger.info(f"Found {len(results)} products in {time.time() - start:.2f}s (db search)")
-        return results
+        docs = await loop.run_in_executor(
+            EXECUTOR,
+            functools.partial(db.similarity_search, query, k)
+        )
+        products = []
+        seen = set()
+        for doc in docs:
+            title = doc.metadata.get("title", "").strip()
+            if title and title not in seen:
+                seen.add(title)
+                products.append({
+                    "title": title,
+                    "price": doc.metadata.get("price", "N/A"),
+                    "url": doc.metadata.get("url", ""),
+                    "description": doc.metadata.get("description", "Professional rental equipment")
+                })
+        return products
     except Exception as e:
-        logger.error(f"Search failed: {e}")
+        logger.error(f"Search error: {e}")
         return []
 
-# ========== Synchronous helper to run llama streaming inside executor ==========
-# Replace your _llm_stream_to_text and call_llm_with_timeout functions with these:
-
-def _simple_llm_call(system_prompt: str, user_question: str, max_tokens: int = LLM_MAX_TOKENS):
-    """Simple synchronous LLM call without streaming - runs in thread"""
-    if llm is None:
-        return None
-    
-    try:
-        logger.info("Making direct LLM call...")
-        start = time.time()
-        
-        response = llm.create_chat_completion(
-            messages=[
-                {"role": "system", "content": system_prompt}, 
-                {"role": "user", "content": user_question}
-            ],
-            temperature=0.2,
-            max_tokens=max_tokens,
-            stream=False  # No streaming to avoid complexity
-        )
-        
-        elapsed = time.time() - start
-        logger.info(f"LLM call completed in {elapsed:.2f}s")
-        
-        if "choices" in response and len(response["choices"]) > 0:
-            content = response["choices"][0]["message"]["content"]
-            logger.info(f"LLM returned: '{content[:100]}...' (length: {len(content)})")
-            return content
-        else:
-            logger.error(f"Invalid LLM response format: {response}")
-            return None
-            
-    except Exception as e:
-        logger.error(f"LLM call failed: {e}")
-        return None
-
-async def call_llm_with_timeout(system_prompt: str, user_question: str, timeout: float = 30.0):
-    """Simplified async wrapper - let LLM run without timeout since we know it works"""
-    if llm is None:
-        logger.warning("LLM is None")
-        return None
-    
+async def get_products_by_names(product_names: List[str]) -> List[dict]:
     loop = asyncio.get_running_loop()
-    
-    try:
-        logger.info("Starting LLM call in executor...")
-        # Run in thread WITHOUT timeout - let it complete naturally
-        result = await loop.run_in_executor(None, _simple_llm_call, system_prompt, user_question)
-        logger.info(f"LLM executor completed successfully")
-        return result
-        
-    except Exception as e:
-        logger.error(f"LLM executor error: {e}")
-        return None
-
-# ========== API endpoint with optimized flow ==========
-@app.post("/chat")
-async def chat(req: ChatRequest):
-    question = req.question.strip()
-    start_time_total = time.time()
-    logger.info(f"📝 Question: {question}")
-
-    # Intent & search run concurrently to save time
-    t0 = time.time()
-    intent = detect_query_intent(question)
-    search_task = asyncio.create_task(search_products(question, k=12))
-    logger.info(f"Intent detected in {time.time() - t0:.2f}s: {intent}")
-
-    raw_products = await search_task
-    products = build_enhanced_context(raw_products, max_items=6)
-
-    # Build prompt (already short)
-    system_prompt = create_intent_based_prompt(products, intent)
-
-    async def stream_response():
-        # Fast path: no products
-        if not products:
-            fallback = create_smart_fallback(products, question, intent)
-            for word in fallback.split():
-                yield word + " "
-                await asyncio.sleep(0)  # yield control
-            return
-
-        if llm is None:
-            # LLM disabled -- use fallback quickly
-            fallback = create_smart_fallback(products, question, intent)
-            for word in fallback.split():
-                yield word + " "
-                await asyncio.sleep(0)
-            return
-
-        # Try LLM but with timeout and fallback
-        logger.info("🧠 Starting LLM call (with timeout)...")
-        llm_start = time.time()
-        text = await call_llm_with_timeout(system_prompt, question, timeout=30.0)
-        logger.info(f"LLM result: text={text is not None}, length={len(text) if text else 0}")
-        llm_elapsed = time.time() - llm_start
-        logger.info(f"LLM call finished in {llm_elapsed:.2f}s (text length: {len(text) if text else 0})")
-
-        if text:
-            # Stream the text back in chunks to client quickly
-            # Break into sensible chunk sizes
-            chunk_size = 256
-            for i in range(0, len(text), chunk_size):
-                yield text[i:i+chunk_size]
-                await asyncio.sleep(0)  # yield control so client receives chunks
-            return
+    products = []
+    for name in product_names:
+        docs = await loop.run_in_executor(
+            EXECUTOR,
+            functools.partial(db.similarity_search, name, 2)
+        )
+        if docs:
+            best = docs[0]
+            products.append({
+                "title": best.metadata.get("title", name),
+                "price": best.metadata.get("price", "N/A"),
+                "url": best.metadata.get("url", ""),
+                "description": best.metadata.get("description", "Professional rental equipment")
+            })
         else:
-            # Timeout or error — return a fast concise fallback
-            logger.info("Using fast fallback due to LLM timeout/error")
-            fallback = create_smart_fallback(products, question, intent)
-            for word in fallback.split():
-                yield word + " "
-                await asyncio.sleep(0)
+            products.append({
+                "title": name,
+                "price": "N/A",
+                "url": "",
+                "description": "Not found in database"
+            })
+    return products
 
-    total_elapsed = time.time() - start_time_total
-    logger.info(f"Total request overhead before LLM/fallback: {total_elapsed:.2f}s")
-    return StreamingResponse(stream_response(), media_type="text/plain")
+def create_llm_prompt(products: List[dict], query: str) -> str:
+    product_list = "\n".join([
+        f"- {p['title']}: ${p['price']}/day, {p['description']}, URL: {p['url']}"
+        for p in products
+    ])
+    return f"""You are Superior Sounds rental assistant.
 
-# If you want to run directly
+User asked: "{query}"
+
+Available products:
+{product_list}
+
+Respond with a short intro sentence or two that addresses the question, includes the type of products found(sound, lighting, stage, dj, or general party equipment), and what they can offer for the user. Do not list specific products."""
+
+def _llm_stream(prompt: str, query: str):
+    if not llm:
+        logger.warning("⚠️ LLM requested but not available")
+        return
+    try:
+        logger.info("🔄 Starting LLM generation...") 
+        stream = llm.create_chat_completion(
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": query}
+            ],
+            temperature=0.1,
+            max_tokens=110,
+            stream=True
+        )
+        token_count = 0
+        for chunk in stream:
+            if "choices" in chunk:
+                delta = chunk["choices"][0]["delta"].get("content", "")
+                if delta:
+                    token_count += 1
+                    yield delta
+        logger.info(f"✅ LLM generated {token_count} tokens")
+    except Exception as e:
+        logger.error(f"LLM error: {e}")
+        return
+
+# GENERATOR WRAPPER
+def string_stream(lines: List[str]):
+    for line in lines:
+        yield line + "\n"
+
+async def combined_stream(prompt: str, query: str, products: List[dict]):
+    llm_response = ""
+    # LLM
+    if llm:
+        for token in _llm_stream(prompt, query):
+            llm_response += token
+            yield token
+        print(f"LLM: {llm_response.strip()}") # prints llm response to console
+        
+    # Always yield products
+    yield "\n\n"
+    for p in products[:6]:
+        title = p.get('title', 'Unknown')
+        price = p.get('price', 'N/A')
+        url = p.get('url', '')
+        desc = p.get('description', 'Professional rental equipment')
+        
+        yield f"## • **{title}** *(${price}/day)* 📝*Details:* {desc} [Book below👇]{url}\n\n"
+
+# MAIN ENDPOINT
+@app.post("/chat")
+async def chat(request: Request):
+    try:
+        body = await request.json()
+        query = body.get("question", "")
+        style = body.get("style", "concise")
+
+        canned = get_canned_response(query)
+        if canned:
+            logger.info(f"🤖 CANNED RESPONSE used for query: '{query}'")
+            intro, product_names = canned
+            if product_names:
+                products = await get_products_by_names(product_names)
+                return StreamingResponse(string_stream([format_response(intro, products)]),
+                                         media_type="text/plain")
+            else:
+                # Policy response
+                return StreamingResponse(string_stream([intro]), media_type="text/plain")
+
+        logger.info(f"🧠 LLM RESPONSE used for query: '{query}'")
+        products = await search_products(query)
+        prompt = create_llm_prompt(products, query)
+        return StreamingResponse(combined_stream(prompt, query, products), media_type="text/plain")
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 if __name__ == "__main__":
-    uvicorn.run("chatbotV3_optimized:app", host="0.0.0.0", port=int(os.getenv("PORT", "8000")), reload=True)
+    uvicorn.run("chatbotV3_optimized:app", host="0.0.0.0", port=8000, reload=True)
+
