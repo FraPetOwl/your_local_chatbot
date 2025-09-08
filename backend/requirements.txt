@@ -1,36 +1,20 @@
-# Web framework
+# Web server & API
 fastapi==0.115.0
-uvicorn[standard]==0.30.6
+uvicorn==0.30.6
 
-# LangChain ecosystem
-langchain==0.2.14
-langchain-community==0.2.12
-langchain-huggingface==0.0.3
-langchain-chroma==0.1.2
+# LangChain
+langchain==0.2.16
+langchain-community==0.2.16
+langchain-core==0.2.43
 
-# Embeddings
+# Embeddings & vector DB
+chromadb==0.5.5
 sentence-transformers==3.0.1
-transformers==4.44.2
 torch>=2.2.0
-numpy>=1.24.0
 
-# Vector database
-chromadb==0.5.3
+# LLM interface
+llama-cpp-python==0.3.16
 
-# Web scraping
-playwright==1.46.0
-beautifulsoup4==4.12.3
-lxml==5.2.2
-
-# HTTP requests / APIs
-requests==2.32.3
-httpx==0.27.2
-
-# Environment variables
-python-dotenv==1.0.1
-
-# Logging / utilities
-tqdm==4.66.5
-
-# Optional for JSON cleaning / parsing
-orjson==3.10.7
+# Core dependencies
+pydantic==2.8.2
+numpy<2,>=1
