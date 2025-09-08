@@ -1,6 +1,6 @@
-# chatbotV4_optimized.py
+# chatbotV3_optimized.py - this one i want to deploy to show as MVP
 # Optimized, streaming-safe version
-# Start with: uvicorn chatbotV4_optimized:app --reload --port 8000
+# Start with: uvicorn chatbotV3_optimized:app --reload --port 8000
 
 import uvicorn
 import json
