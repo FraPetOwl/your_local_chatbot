@@ -119,6 +119,7 @@ const ChatbotWidget = ({ apiEndpoint = 'http://localhost:8000' }) => {
             className="inline-flex items-center text-blue-600 hover:text-blue-800 underline"
           >
             View Product <ExternalLink className="w-3 h-3 ml-1" />
+            
           </a>
         );
       }
