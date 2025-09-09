@@ -108,7 +108,8 @@ if os.getenv("LLM_ENABLED", "1") != "0" and Llama is not None:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://158.101.102.126"   
+        "http://158.101.102.126",
+         "http://localhost:5173",   
     ],
     allow_credentials=True,
     allow_methods=["*"],
