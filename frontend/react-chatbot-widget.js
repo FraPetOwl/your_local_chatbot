@@ -3,7 +3,8 @@ import { Resizable } from 're-resizable';
 import { MessageCircle, X, Send, Loader2, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
-const ChatbotWidget = ({ apiEndpoint = 'http://localhost:8000' }) => {
+const ChatbotWidget = ({ apiEndpoint = 'http://158.101.102.126:8000' }) => {
+  console.log('ChatbotWidget apiEndpoint prop:', apiEndpoint); 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -27,6 +28,7 @@ const ChatbotWidget = ({ apiEndpoint = 'http://localhost:8000' }) => {
   }, [messages]);
 
   const sendMessage = async () => {
+     console.log('Using API Endpoint:', apiEndpoint); 
     if (!inputMessage.trim() || isLoading) return;
 
     const userMessage = {
@@ -43,12 +45,8 @@ const ChatbotWidget = ({ apiEndpoint = 'http://localhost:8000' }) => {
     try {
       const response = await fetch(`${apiEndpoint}/chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question: inputMessage
-        })
+        headers: {'Content-Type': 'application/json',},
+        body: JSON.stringify({question: inputMessage})
       });
 
       if (response.ok) {

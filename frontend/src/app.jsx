@@ -1,5 +1,7 @@
 import React from 'react';
 import { ChatWidget } from './components/ChatWidget';
+console.log(">>> Rendering ChatWidget component");
+
 
 function App() {
   return (
@@ -39,7 +41,7 @@ function App() {
       </div>
 
       <ChatWidget
-        apiUrl="http://localhost:8000/chat"
+        apiUrl="http://158.101.102.126:8000"
         draggable={true}
         resizable={true}
         theme={{

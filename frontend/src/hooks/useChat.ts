@@ -1,16 +1,16 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Message, ChatState } from '../Components/types';
+import { Message, ChatState } from '../components/types';
 
 const STORAGE_KEY = 'superior-sounds-chatbot-messages';
 
-export const useChat = (apiUrl = 'http://localhost:8000/chat') => {
+export const useChat = (apiUrl = 'http://158.101.102.126:8000') => {
   const [state, setState] = useState<ChatState>({
     messages: [],
     isLoading: false,
     isMinimized: true,
     error: null,
   });
-
+  
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Load messages from localStorage on mount
@@ -56,97 +56,99 @@ export const useChat = (apiUrl = 'http://localhost:8000/chat') => {
     }));
   }, []);
 
-  const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || state.isLoading) return;
+  const sendMessage = useCallback(
+    async (text: string) => {
+      if (!text.trim() || state.isLoading) return;
 
-    // Add user message
-    addMessage({
-      text: text.trim(),
-      isBot: false,
-      timestamp: Date.now(),
-    });
-
-    // Add streaming bot message
-    const botMessageId = addMessage({
-      text: '',
-      isBot: true,
-      timestamp: Date.now(),
-      isStreaming: true,
-    });
-
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      // Cancel any previous request
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      abortControllerRef.current = new AbortController();
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question: text.trim(),
-          style: 'concise',
-        }),
-        signal: abortControllerRef.current.signal,
+      // Add user message
+      addMessage({
+        text: text.trim(),
+        isBot: false,
+        timestamp: Date.now(),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      // Add streaming bot message
+      const botMessageId = addMessage({
+        text: '',
+        isBot: true,
+        timestamp: Date.now(),
+        isStreaming: true,
+      });
 
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('Response body is not readable');
-      }
+      setState(prev => ({ ...prev, isLoading: true, error: null }));
 
-      let accumulatedText = '';
+      try {
+        // Cancel any previous request
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
 
-      while (true) {
-        const { done, value } = await reader.read();
-        
-        if (done) break;
+        abortControllerRef.current = new AbortController();
 
-        const chunk = new TextDecoder().decode(value);
-        accumulatedText += chunk;
+        const response = await fetch(`${apiUrl}/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            question: text.trim(),
+            style: 'concise',
+          }),
+          signal: abortControllerRef.current.signal,
+        });
 
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error('Response body is not readable');
+        }
+
+        let accumulatedText = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = new TextDecoder().decode(value);
+          accumulatedText += chunk;
+
+          updateMessage(botMessageId, {
+            text: accumulatedText,
+            isStreaming: true,
+          });
+        }
+
+        // Mark streaming as complete
         updateMessage(botMessageId, {
           text: accumulatedText,
-          isStreaming: true,
+          isStreaming: false,
         });
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          return; // Request was cancelled
+        }
+
+        console.error('Chat API error:', error);
+
+        updateMessage(botMessageId, {
+          text: 'Sorry, I encountered an error. Please try again.',
+          isStreaming: false,
+        });
+
+        setState(prev => ({
+          ...prev,
+          error:
+            'Failed to send message. Please check your connection and try again.',
+        }));
+      } finally {
+        setState(prev => ({ ...prev, isLoading: false }));
       }
-
-      // Mark streaming as complete
-      updateMessage(botMessageId, {
-        text: accumulatedText,
-        isStreaming: false,
-      });
-
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        return; // Request was cancelled
-      }
-
-      console.error('Chat API error:', error);
-      
-      updateMessage(botMessageId, {
-        text: 'Sorry, I encountered an error. Please try again.',
-        isStreaming: false,
-      });
-
-      setState(prev => ({
-        ...prev,
-        error: 'Failed to send message. Please check your connection and try again.',
-      }));
-    } finally {
-      setState(prev => ({ ...prev, isLoading: false }));
-    }
-  }, [apiUrl, state.isLoading, addMessage, updateMessage]);
+    },
+    [apiUrl, state.isLoading, addMessage, updateMessage]
+  );
 
   const clearHistory = useCallback(() => {
     setState(prev => ({ ...prev, messages: [] }));
