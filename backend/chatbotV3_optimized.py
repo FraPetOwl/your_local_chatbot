@@ -2,7 +2,6 @@
 # Optimized, streaming-safe version
 # Start with: uvicorn chatbotV3_optimized:app --reload --port 8000
 
-import uvicorn
 import json
 import time
 import asyncio
@@ -289,5 +288,6 @@ async def chat(request: Request):
 
 
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run("chatbotV3_optimized:app", host="0.0.0.0", port=8000, reload=True)
 
