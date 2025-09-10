@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChatWidget } from './components/ChatWidget';
+import { ChatWidget } from './components_tmp/ChatWidget';
 console.log(">>> Rendering ChatWidget component");
 
 

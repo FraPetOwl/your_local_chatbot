@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Message, ChatState } from '../components/types';
+import { Message, ChatState } from '../components_tmp/types';
 
 const STORAGE_KEY = 'superior-sounds-chatbot-messages';
 
