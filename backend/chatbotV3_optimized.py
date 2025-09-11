@@ -108,6 +108,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://158.101.102.126",
+        "https://your-local-chatbot-nu5rfmw3j-frapetowls-projects.vercel.app/",
          "http://localhost:5173",   
     ],
     allow_credentials=True,
@@ -210,7 +211,8 @@ def _llm_stream(prompt: str, query: str):
         logger.warning("⚠️ LLM requested but not available")
         return
     try:
-        logger.info("🔄 Starting LLM generation...") 
+        logger.info("🔄 Starting LLM generation...")
+        start_time = time.time() 
         stream = llm.create_chat_completion(
             messages=[
                 {"role": "system", "content": prompt},
@@ -227,7 +229,7 @@ def _llm_stream(prompt: str, query: str):
                 if delta:
                     token_count += 1
                     yield delta
-        logger.info(f"✅ LLM generated {token_count} tokens")
+        logger.info(f"✅ LLM generated {token_count} tokens and took {time.time() - start_time:.2f} seconds")
     except Exception as e:
         logger.error(f"LLM error: {e}")
         return
