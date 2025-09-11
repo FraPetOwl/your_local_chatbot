@@ -1,9 +1,10 @@
 import React from 'react';
-import ChatWidget from './components_tmp/ChatWidget';
+import {ChatWidget} from './components_tmp/ChatWidget';
 console.log(">>> Rendering ChatWidget component");
 
 
 function App() {
+  console.log(">>> App loaded"); // debug
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="container mx-auto px-4 py-8">
