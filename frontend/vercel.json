@@ -1,11 +1,6 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "vite.config.*", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
-  ],
-  "routes": [
-    { "src": "/assets/(.*)", "dest": "/assets/$1", "headers": { "cache-control": "max-age=31536000" } },
-    { "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))", "dest": "/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
   ]
 }
