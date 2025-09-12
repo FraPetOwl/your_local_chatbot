@@ -1,4 +1,3 @@
-import React from 'react';
 import {ChatWidget} from './components/ChatWidget';
 console.log("Rendering ChatWidget component"); // debug
 
