@@ -107,9 +107,9 @@ if os.getenv("LLM_ENABLED", "1") != "0" and Llama is not None:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://158.101.102.126",
-        "https://your-local-chatbot-nu5rfmw3j-frapetowls-projects.vercel.app/",
-         "http://localhost:5173",   
+        "http://158.101.102.126", # oracle server for backend
+        "vite-react-psi-kohl-54.vercel.app", # vercel frontend
+         "http://localhost:5173", # local frontend dev
     ],
     allow_credentials=True,
     allow_methods=["*"],
