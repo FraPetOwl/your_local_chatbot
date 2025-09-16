@@ -3,7 +3,7 @@ import { Message, ChatState } from '../components/types';
 
 const STORAGE_KEY = 'superior-sounds-chatbot-messages';
 
-export const useChat = (apiUrl = 'http://158.101.102.126:8000') => {
+export const useChat = (apiUrl = import.meta.env.VITE_API_URL || "http://158.101.102.126:8000") => {
   const [state, setState] = useState<ChatState>({
     messages: [],
     isLoading: false,
