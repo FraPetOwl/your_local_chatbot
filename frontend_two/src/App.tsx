@@ -41,7 +41,7 @@ function App() {
       </div>
 
       <ChatWidget
-        apiUrl= {"https://multiple-succeed-satisfied-alfred.trycloudflare.com"}
+        apiUrl= {"https://gathered-opportunities-perth-refined.trycloudflare.com"}
         draggable={true}
         resizable={true}
         theme={{

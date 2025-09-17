@@ -3,7 +3,7 @@ import { Message, ChatState } from '../components/types';
 
 const STORAGE_KEY = 'superior-sounds-chatbot-messages';
 
-export const useChat = (apiUrl = "https://multiple-succeed-satisfied-alfred.trycloudflare.com") => {
+export const useChat = (apiUrl = "https://gathered-opportunities-perth-refined.trycloudflare.com") => {
   const [state, setState] = useState<ChatState>({
     messages: [],
     isLoading: false,
