@@ -7,7 +7,7 @@ import { ChatInput } from './ChatInput';
 import { Loader2 } from 'lucide-react';
 
 export const ChatWidget: React.FC<ChatWidgetProps> = ({
-  apiUrl = "https://farm-routers-too-advised.trycloudflare.com",
+  apiUrl = "https://multiple-succeed-satisfied-alfred.trycloudflare.com",
   theme = {},
   draggable = true,
   resizable = true,
