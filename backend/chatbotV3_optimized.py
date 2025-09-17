@@ -12,7 +12,6 @@ import concurrent.futures
 import functools
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -102,25 +101,6 @@ if os.getenv("LLM_ENABLED", "1") != "0" and Llama is not None:
     except Exception as e:
         logger.error(f"LLM failed: {e}")
         llm = None
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins = [
-    # Production frontend URLs
-    "https://frontend-6x7m8wgti-frapetowls-projects.vercel.app/",
-    "https://frontend-ojuhtp3s2-frapetowls-projects.vercel.app",
-    "https://vite-react-psi-kohl-54.vercel.app",
-    "https://frontendtwo-frapetowls-projects.vercel.app",
-    "https://frontendtwo-git-clean-frontend-overhaul-frapetowls-projects.vercel.app",
-    "https://*.vercel.app",
-    # local dev frontend
-    "http://localhost:5173",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # HELPERS
 def format_response(intro: str, products: List[dict]) -> str:
