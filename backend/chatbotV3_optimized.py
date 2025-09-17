@@ -40,7 +40,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Backend is running!"}
+    return {"message": "Superior Sounds Chatbot API", "status": "running"}
 
 @app.get("/health")
 async def health():
