@@ -7,7 +7,7 @@ import { ChatInput } from './ChatInput';
 import { Loader2 } from 'lucide-react';
 
 export const ChatWidget: React.FC<ChatWidgetProps> = ({
-  apiUrl = import.meta.env.VITE_API_URL || "http://158.101.102.126:8000",
+  apiUrl = `/api/chat`,
   theme = {},
   draggable = true,
   resizable = true,
