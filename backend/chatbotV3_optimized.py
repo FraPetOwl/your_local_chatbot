@@ -106,10 +106,14 @@ if os.getenv("LLM_ENABLED", "1") != "0" and Llama is not None:
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://158.101.102.126", # oracle server for backend
-        "vite-react-psi-kohl-54.vercel.app", # vercel frontend
-         "http://localhost:5173", # local frontend dev
+    allow_origins = [
+        # Production frontend URLs
+    "https://frontend-ojuhtp3s2-frapetowls-projects.vercel.app",
+    "https://vite-react-psi-kohl-54.vercel.app",
+    "https://frontendtwo-frapetowls-projects.vercel.app",
+    "https://frontendtwo-git-clean-frontend-overhaul-frapetowls-projects.vercel.app",
+    # local dev frontend
+    "http://localhost:5173",
     ],
     allow_credentials=True,
     allow_methods=["*"],
