@@ -41,7 +41,7 @@ function App() {
       </div>
 
       <ChatWidget
-        apiUrl= {"https://bass-widespread-anna-pavilion.trycloudflare.com"}
+        apiUrl= {"https://farm-routers-too-advised.trycloudflare.com"}
         draggable={true}
         resizable={true}
         theme={{
