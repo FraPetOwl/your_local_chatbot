@@ -7,7 +7,7 @@ import { ChatInput } from './ChatInput';
 import { Loader2 } from 'lucide-react';
 
 export const ChatWidget: React.FC<ChatWidgetProps> = ({
-  apiUrl = `/api`,
+  apiUrl = "https://bass-widespread-anna-pavilion.trycloudflare.com",
   theme = {},
   draggable = true,
   resizable = true,
