@@ -112,6 +112,7 @@ app.add_middleware(
     "https://vite-react-psi-kohl-54.vercel.app",
     "https://frontendtwo-frapetowls-projects.vercel.app",
     "https://frontendtwo-git-clean-frontend-overhaul-frapetowls-projects.vercel.app",
+    "https://*.vercel.app",
     # local dev frontend
     "http://localhost:5173",
     "https://buses-platforms-queensland-phrase.trycloudflare.com",
