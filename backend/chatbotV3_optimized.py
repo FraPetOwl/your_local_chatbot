@@ -116,7 +116,6 @@ app.add_middleware(
     "https://*.vercel.app",
     # local dev frontend
     "http://localhost:5173",
-    "https://buses-platforms-queensland-phrase.trycloudflare.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
