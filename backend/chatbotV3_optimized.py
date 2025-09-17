@@ -2,7 +2,6 @@
 # Optimized, streaming-safe version
 # Start with: uvicorn chatbotV3_optimized:app --reload --port 8000
 
-import json
 import time
 import asyncio
 import os
@@ -12,12 +11,14 @@ import concurrent.futures
 import functools
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
+
 
 try:
     from llama_cpp import Llama
@@ -28,6 +29,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("chatbotV3_optimized")
 
 app = FastAPI(title="Superior Sounds Chatbot", version="4.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://frontend-2wfu932fg-frapetowls-projects.vercel.app"],  # Your specific frontend
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=800)
