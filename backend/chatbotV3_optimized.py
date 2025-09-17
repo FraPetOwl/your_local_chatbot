@@ -38,6 +38,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    return {"message": "Backend is running!"}
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
+@app.options("/chat")
+async def chat_options():
+    return {"message": "CORS preflight OK"}
+
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=800)
 
