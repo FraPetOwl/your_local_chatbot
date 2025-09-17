@@ -3,7 +3,7 @@ import { Message, ChatState } from '../components/types';
 
 const STORAGE_KEY = 'superior-sounds-chatbot-messages';
 
-export const useChat = (apiUrl = `/api/chat`) => {
+export const useChat = (apiUrl = `/api`) => {
   const [state, setState] = useState<ChatState>({
     messages: [],
     isLoading: false,

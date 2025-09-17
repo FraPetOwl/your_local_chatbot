@@ -3,7 +3,7 @@ import { Resizable } from 're-resizable';
 import { MessageCircle, X, Send, Loader2, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
-const ChatbotWidget = ( {apiEndpoint = `/api/chat`}) => {
+const ChatbotWidget = ( {apiEndpoint = `/api`}) => {
   console.log('ChatbotWidget apiEndpoint prop:', apiEndpoint); 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([

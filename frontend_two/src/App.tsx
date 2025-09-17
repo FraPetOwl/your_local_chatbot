@@ -41,7 +41,7 @@ function App() {
       </div>
 
       <ChatWidget
-        apiUrl= {`/api/chat`}
+        apiUrl= {`/api`}
         draggable={true}
         resizable={true}
         theme={{

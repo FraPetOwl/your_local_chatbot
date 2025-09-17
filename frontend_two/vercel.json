@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://buses-platforms-queensland-phrase.trycloudflare.com/:path*"
+      "destination": " https://bass-widespread-anna-pavilion.trycloudflare.com/:path*"
     }
   ]
 }
