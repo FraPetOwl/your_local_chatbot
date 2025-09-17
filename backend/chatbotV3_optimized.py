@@ -107,13 +107,14 @@ if os.getenv("LLM_ENABLED", "1") != "0" and Llama is not None:
 app.add_middleware(
     CORSMiddleware,
     allow_origins = [
-        # Production frontend URLs
+    # Production frontend URLs
     "https://frontend-ojuhtp3s2-frapetowls-projects.vercel.app",
     "https://vite-react-psi-kohl-54.vercel.app",
     "https://frontendtwo-frapetowls-projects.vercel.app",
     "https://frontendtwo-git-clean-frontend-overhaul-frapetowls-projects.vercel.app",
     # local dev frontend
     "http://localhost:5173",
+    "https://buses-platforms-queensland-phrase.trycloudflare.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
