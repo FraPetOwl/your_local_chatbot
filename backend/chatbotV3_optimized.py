@@ -1,6 +1,10 @@
 # chatbotV3_optimized.py - this one i want to deploy to show as MVP
 # Optimized, streaming-safe version
-# Start with: uvicorn chatbotV3_optimized:app --reload --port 8000
+# Start in backend! : cd /home/pfras/your_local_chatbot/backend./.venv/bin/uvicorn chatbotV3_optimized:app --reload --port 8000 --host 127.0.0.1
+## Install Hugging Face CLI: pip install huggingface-hub
+# Download specific model: huggingface-cli download HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF smollm2-1.7b-instruct-q4_k_m.gguf
+# after setting up virtualenv with required packages: sudo apt-get update
+#sudo apt-get install build-essential cmake
 
 import uvicorn
 import json
@@ -209,13 +213,17 @@ def _llm_stream(prompt: str, query: str):
         return
     try:
         logger.info("🔄 Starting LLM generation...") 
+        
+        # Add timing start
+        start_time = time.time()
+        
         stream = llm.create_chat_completion(
             messages=[
                 {"role": "system", "content": prompt},
                 {"role": "user", "content": query}
             ],
             temperature=0.1,
-            max_tokens=110,
+            max_tokens=250,
             stream=True
         )
         token_count = 0
@@ -225,7 +233,14 @@ def _llm_stream(prompt: str, query: str):
                 if delta:
                     token_count += 1
                     yield delta
+        
+        # Calculate generation time
+        end_time = time.time()
+        generation_time = end_time - start_time
+        
         logger.info(f"✅ LLM generated {token_count} tokens")
+        logger.info(f"🕒 LLM Generation Time: {generation_time:.4f} seconds")
+        
     except Exception as e:
         logger.error(f"LLM error: {e}")
         return
@@ -234,6 +249,30 @@ def _llm_stream(prompt: str, query: str):
 def string_stream(lines: List[str]):
     for line in lines:
         yield line + "\n"
+
+
+# Basic landing and health endpoints for quick checks and frontend integration
+@app.get("/")
+async def root():
+    return {
+        "message": "Superior Sounds Chatbot",
+        "endpoints": ["/chat (POST)", "/health (GET)"],
+        "docs": "/docs"
+    }
+
+
+@app.get("/health")
+async def health():
+    try:
+        db_count = db._collection.count() if hasattr(db._collection, "count") else "unknown"
+    except Exception as e:
+        db_count = f"error: {e}"
+    return {
+        "status": "healthy",
+        "version": "4.0",
+        "db_count": db_count,
+        "llm_loaded": bool(llm)
+    }
 
 async def combined_stream(prompt: str, query: str, products: List[dict]):
     llm_response = ""

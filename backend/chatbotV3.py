@@ -1,7 +1,8 @@
 # chatbotV3.py
-# This script implements an optimized chatbot API for Superior Sounds Events using FastAPI and LangChain.
-# It includes enhanced query expansion, intent detection, and improved response generation.
-# It also features better error handling, logging, and streaming responses in order to provide help users to find the right rental equipment.
+# This script implements an optimized chatbot API for Superior Sounds Events using FastAPI 
+# and LangChain. It includes enhanced query expansion, intent detection, and improved response 
+# generation. It also features better error handling, logging, and streaming responses in order
+# to provide help users to find the right rental equipment.
 
 import uvicorn
 import json
@@ -144,52 +145,32 @@ def detect_query_intent(query: str) -> str:
         return 'general'
 
 # Enhanced context building with better deduplication and metadata to improve response quality
+        from langchain_community.llms import Ollama
 
 def build_enhanced_context(docs: List[Document], max_items: int = 6) -> List[dict]:
     """Build enhanced context with better product data."""
     items = []
     seen_titles = set()
-    
-    for doc in docs:
-        
-        price = doc.metadata.get("price", "").strip()
-        url = doc.metadata.get("url", "").strip()
-        category = doc.metadata.get("category", "").strip()
-        description = doc.metadata.get("description") or doc.page_content or "" # description assigned from metadata or page content
-        
-        title = doc.metadata.get("title", "").strip() # Avoid empty or duplicate titles
-        if not title or (title.lower(), price) in seen_titles: # if title is empty or already seen, skip
-            continue
-        seen_titles.add(title.lower()) # track seen titles in lowercase for case-insensitive deduplication
+        # Initialize components
+        embedding = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2",
+            model_kwargs={'device': 'cpu'},
+            encode_kwargs={'normalize_embeddings': True}
+        )
 
-        # Keep more description for better responses
-        if len(description) > 1000:
-            description = description[:997] + "..."
-            
-        items.append({
-            "title": title,
-            "price": price,
-            "description": description,
-            "url": url,
-            "category": category
-        })
-        
-        if len(items) >= max_items:
-            break
-    
-    return items
+        try:
+            db = Chroma(persist_directory=CHROMA_DIR, embedding_function=embedding)
 
-def create_intent_based_prompt(context: List[dict], intent: str) -> str:
-    """Create prompts based on query intent for better responses."""
-    
-    base_rules = """You are Superior Sounds' rental assistant. 
-        RULES:
-        1. ONLY recommend products shown between [PRODUCT] blocks.
-        2. Use the exact Title, Price, and URL as provided.
-        3. All rentals are by the day.
-        4. Always include the exact URL from the product section using 'Book: [URL]'."""
+            logger.info("✅ Database loaded successfully")
+            import sys, os
+            logger.info(f"Python exec: {sys.executable}")
+            logger.info(f"Using Chroma persist_directory: {CHROMA_DIR}, count: {getattr(db._collection, 'count', lambda: 'unknown')()}")
 
-    intent_instructions = {
+
+
+        except Exception as e:
+            logger.error(f"❌ Failed to load database: {e}")
+            raise
         'event_package': 'Suggest multiple items that work well together for the event type.',
         'recommendation': 'Provide detailed recommendations with reasoning.',
         'budget_focused': 'Highlight the most affordable options and mention prices clearly.',
